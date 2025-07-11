@@ -2,28 +2,27 @@
 
 namespace App\Policies;
 
-use App\Models\Kategori;
+use App\Models\Pelanggan;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;
 
-class KategoriPolicy
+class PelangganHutangPolicy
 {
     /**
      * Determine whether the user can view any models.
      */
     public function viewAny(User $user): bool
     {
-        if ($user->hasPermissionTo('View Kategori')) {
+        if ($user->hasPermissionTo('View Pelanggan Hutang')) {
             return true;
         }
         return false;
-        // return $user->hasRole('Admin');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Kategori $kategori): bool
+    public function view(User $user, Pelanggan $pelanggan): bool
     {
         return false;
     }
@@ -33,46 +32,37 @@ class KategoriPolicy
      */
     public function create(User $user): bool
     {
-        if ($user->hasPermissionTo('Create')) {
-            return true;
-        }
         return false;
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Kategori $kategori): bool
+    public function update(User $user, Pelanggan $pelanggan): bool
     {
-        if ($user->hasPermissionTo('Edit')) {
-            return true;
-        }
         return false;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Kategori $kategori): bool
+    public function delete(User $user, Pelanggan $pelanggan): bool
     {
-        if ($user->hasPermissionTo('Delete')) {
-            return true;
-        }
         return false;
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, Kategori $kategori): bool
+    public function restore(User $user, Pelanggan $pelanggan): bool
     {
-        return $user->hasRole('Admin');
+        return false;
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, Kategori $kategori): bool
+    public function forceDelete(User $user, Pelanggan $pelanggan): bool
     {
         return false;
     }

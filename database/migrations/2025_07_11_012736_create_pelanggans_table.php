@@ -11,8 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('penjualans', function (Blueprint $table) {
+        Schema::create('pelanggans', function (Blueprint $table) {
             $table->id();
+            $table->string('nama');
+            $table->string('no_hp');
+            $table->string('provinces');
+            $table->string('regencies');
+            $table->string('districts');
+            $table->string('villages');
+            $table->text('alamat_lengkap');
             $table->timestamps();
         });
     }
@@ -22,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('penjualans');
+        Schema::dropIfExists('pelanggans');
     }
 };

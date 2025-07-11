@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('detai_penjualans', function (Blueprint $table) {
+        Schema::create('provinces', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->string('alt_name')->default('');
+            $table->double('latitude')->default(0);
+            $table->double('longitude')->default(0);
             $table->timestamps();
         });
     }
@@ -22,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('detai_penjualans');
+        Schema::dropIfExists('provinces');
     }
 };
