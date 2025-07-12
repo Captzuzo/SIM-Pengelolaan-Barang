@@ -13,6 +13,7 @@ class CetakLaporanLabaController extends Controller
 {
     public function cetak(Request $request)
     {
+
         $tanggalMulai = $request->tanggalMulai;
         $tanggalSelesai = $request->tanggalSelesai;
 

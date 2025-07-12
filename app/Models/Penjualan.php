@@ -16,6 +16,11 @@ class Penjualan extends Model
         'status_pembayaran',
     ];
 
+    public function barangs()
+    {
+        return $this->belongsToMany(Barang::class, 'detail_penjualans');
+    }
+
     public function pelanggan()
     {
         return $this->belongsTo(Pelanggan::class);

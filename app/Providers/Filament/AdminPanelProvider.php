@@ -2,6 +2,11 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Laporan\LaporanHarianPage;
+use App\Filament\Pages\Laporan\LaporanLabaPage;
+use App\Filament\Resources\BarangResource;
+use App\Filament\Resources\LaporanStokResource\Pages\LaporanStokPage;
+use App\Models\Barang;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -32,8 +37,14 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->resources([
+                BarangResource::class,
+            ])
             ->pages([
                 Pages\Dashboard::class,
+                LaporanStokPage::class,
+                LaporanLabaPage::class,
+                LaporanHarianPage::class,
             ])
             ->spa()
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')

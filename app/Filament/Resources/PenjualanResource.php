@@ -217,7 +217,7 @@ class PenjualanResource extends Resource
             ->actions([
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\Action::make('invoice-penjualan')
-                    ->label('Cetak Invoice')
+                    ->label('Cetak')
                     ->icon('heroicon-o-printer')
                     ->url(fn(Penjualan $record) => route('penjualan.invoice-penjualan', $record->id))
                     ->openUrlInNewTab(),

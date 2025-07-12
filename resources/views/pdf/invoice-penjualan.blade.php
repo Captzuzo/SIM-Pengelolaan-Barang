@@ -57,6 +57,10 @@
             <td class="no-border text-right"><strong>Sisa:</strong></td>
             <td class="no-border text-right">Rp {{ number_format($penjualan->sisa, 0, ',', '.') }}</td>
         </tr>
+        <tr>
+            <td class="no-border text-right"><strong>Status:</strong></td>
+            <td class="no-border text-right">{{ $penjualan->status_pembayaran}}</td>
+        </tr>
     </table>
 
     <p style="margin-top: 30px;">Terima kasih telah berbelanja!</p>
