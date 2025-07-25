@@ -33,29 +33,37 @@ class UserResource extends Resource
                 Card::make()->schema([
                     Forms\Components\TextInput::make('name')
                         ->required()
+                        ->columnSpan(2)
                         ->unique(ignoreRecord: true)
+
                         ->maxLength(255),
                     Forms\Components\TextInput::make('username')
                         ->required()
+                        ->columnSpan(2)
                         ->unique(ignoreRecord: true)
                         ->maxLength(255),
                     Forms\Components\TextInput::make('email')
                         ->email()
+                        ->columnSpan(2)
                         ->required()
                         ->maxLength(255),
-                    Forms\Components\DateTimePicker::make('email_verified_at'),
+                    Forms\Components\DateTimePicker::make('email_verified_at')
+                        ->columnSpan(2),
                     Forms\Components\TextInput::make('password')
                         ->password()
+                        ->columnSpan(2)
                         ->required(fn(Page $livewire) => $livewire instanceof CreateUser)
                         ->dehydrateStateUsing(fn($state) => Hash::make($state))
                         ->dehydrated(fn($state) => filled($state))
                         ->maxLength(255),
                     Forms\Components\Select::make('roles')
                         ->multiple()
+                        ->columnSpan(2)
                         ->relationship('roles', 'name')
                         ->preload(),
                     Forms\Components\Select::make('permissions')
                         ->multiple()
+                        ->columnSpan(2)
                         ->relationship('permissions', 'name')
                         ->preload(),
                 ])->columns(2)
