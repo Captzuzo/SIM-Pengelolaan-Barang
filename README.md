@@ -54,33 +54,49 @@ Filament-Roles ini dibangun menggunakan **Laravel 12**, **Filament Admin Panel**
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/nama-kamu/nama-project.git
-cd nama-project
+git clone https://github.com/Captzuzo/SIM-Pengelolaan-Barang.git
+cd SIM-Pengelolaan-Barang
 ```
 
 ## 2. Install Composer
 
+```bash
 composer install
+```
 
 ## 3. Atur .env sesuai contoh menggunakan mysql
 
+```bash
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
 DB_DATABASE=nama_database
 DB_USERNAME=root
 DB_PASSWORD=
+```
 
 ## 4. Migrasi Database dan Seeder
 
+```bash
 php artisan migrate
 php artisan db:seed
+```
 
 ## 4. Jalankan Server
 
+```bash
 php artisan serve
+```
 
 ## 5. Login
 
+```bash
+Admin
 email : admin1@admin.com
 password : password
+```
+
+```bash
+email : kasir@kasir.com
+password : password
+```
