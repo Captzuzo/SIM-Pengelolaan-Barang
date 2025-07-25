@@ -14,6 +14,30 @@ class DetailPenjualan extends Model
         'subtotal',
     ];
 
+    protected static function booted(): void
+    {
+        static::created(function ($detail) {
+            $barang = $detail->barang;
+            $barang->stok -= $detail->qty;
+            $barang->save();
+        });
+
+        static::updated(function ($detail) {
+            $originalQty = $detail->getOriginal('qty');
+            $diff = $detail->qty - $originalQty;
+
+            $barang = $detail->barang;
+            $barang->stok -= $diff;
+            $barang->save();
+        });
+
+        static::deleted(function ($detail) {
+            $barang = $detail->barang;
+            $barang->stok += $detail->qty;
+            $barang->save();
+        });
+    }
+
     public function barang()
     {
         return $this->belongsTo(Barang::class);

@@ -13,6 +13,11 @@ class KategoriPolicy
      */
     public function viewAny(User $user): bool
     {
+
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+
         if ($user->hasPermissionTo('View Kategori')) {
             return true;
         }
@@ -33,7 +38,12 @@ class KategoriPolicy
      */
     public function create(User $user): bool
     {
-        if ($user->hasPermissionTo('Create')) {
+
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+
+        if ($user->hasPermissionTo('Create Kategori')) {
             return true;
         }
         return false;
@@ -44,7 +54,10 @@ class KategoriPolicy
      */
     public function update(User $user, Kategori $kategori): bool
     {
-        if ($user->hasPermissionTo('Edit')) {
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+        if ($user->hasPermissionTo('Edit Kategori')) {
             return true;
         }
         return false;
@@ -55,7 +68,10 @@ class KategoriPolicy
      */
     public function delete(User $user, Kategori $kategori): bool
     {
-        if ($user->hasPermissionTo('Delete')) {
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+        if ($user->hasPermissionTo('Delete Kategori')) {
             return true;
         }
         return false;

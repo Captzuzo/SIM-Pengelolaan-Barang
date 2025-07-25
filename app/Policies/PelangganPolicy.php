@@ -13,6 +13,9 @@ class PelangganPolicy
      */
     public function viewAny(User $user): bool
     {
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
         if ($user->hasPermissionTo('View Pelanggan')) {
             return true;
         }
@@ -32,6 +35,9 @@ class PelangganPolicy
      */
     public function create(User $user): bool
     {
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
         if ($user->hasPermissionTo('Create Pelanggan')) {
             return true;
         }
@@ -43,6 +49,9 @@ class PelangganPolicy
      */
     public function update(User $user, Pelanggan $pelanggan): bool
     {
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
         if ($user->hasPermissionTo('Edit Pelanggan')) {
             return true;
         }
@@ -54,6 +63,9 @@ class PelangganPolicy
      */
     public function delete(User $user, Pelanggan $pelanggan): bool
     {
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
         if ($user->hasPermissionTo('Delete Pelanggan')) {
             return true;
         }

@@ -26,6 +26,7 @@ class PelangganResource extends Resource
     protected static ?string $model = Pelanggan::class;
     protected static ?string $navigationGroup = 'Master';
     protected static ?string $navigationLabel = 'Pelanggan';
+    protected static ?string $slug = 'pelanggan';
     protected static ?int $navigationSort = 3;
     protected static ?string $navigationIcon = 'heroicon-o-User';
 

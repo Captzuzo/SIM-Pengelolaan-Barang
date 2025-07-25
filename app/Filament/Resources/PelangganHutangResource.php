@@ -23,10 +23,11 @@ class PelangganHutangResource extends Resource
 {
     protected static ?string $model = Penjualan::class;
     protected static ?string $navigationGroup = 'Transaksi';
+    protected static ?string $slug = 'pelanggan-hutang';
     protected static ?string $pluralLabel = 'Pelanggan Hutang';
     protected static ?string $navigationLabel = 'Pelanggan Hutang';
     protected static ?string $navigationIcon = 'heroicon-o-wallet';
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 10;
 
     public static function form(Form $form): Form
     {

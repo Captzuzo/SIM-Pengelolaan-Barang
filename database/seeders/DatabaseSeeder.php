@@ -31,5 +31,10 @@ class DatabaseSeeder extends Seeder
 
         $role1 = Role::create(['name' => 'Kasir']);
         $user1->assignRole($role1);
+
+        $this->call([
+            RolesSeeder::class,
+            PermissionsSeeder::class,
+        ]);
     }
 }

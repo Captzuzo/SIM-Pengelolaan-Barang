@@ -1,0 +1,55 @@
+<?php
+
+namespace Database\Seeders;
+
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+
+class PermissionsSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $now = Carbon::now();
+
+        $permissions = [
+            ['name' => 'Create User'],
+            ['name' => 'Create Role'],
+            ['name' => 'Create Permission'],
+            ['name' => 'Create Kategori'],
+            ['name' => 'Create Barang'],
+            ['name' => 'Create Pelanggan'],
+            ['name' => 'Create Penjualan'],
+            ['name' => 'Edit User'],
+            ['name' => 'Edit Role'],
+            ['name' => 'Edit Permission'],
+            ['name' => 'Edit Kategori'],
+            ['name' => 'Edit Barang'],
+            ['name' => 'Edit Pelanggan'],
+            ['name' => 'Edit Penjualan'],
+            ['name' => 'Delete User'],
+            ['name' => 'Delete Role'],
+            ['name' => 'Delete Permission'],
+            ['name' => 'Delete Kategori'],
+            ['name' => 'Delete Barang'],
+            ['name' => 'Delete Pelanggan'],
+            ['name' => 'Delete Penjualan'],
+            ['name' => 'View User'],
+            ['name' => 'View Role'],
+            ['name' => 'View Permission'],
+            ['name' => 'View Kategori'],
+        ];
+
+        foreach ($permissions as &$permission) {
+            $permission['guard_name'] = 'web';
+            $permission['created_at'] = $now;
+            $permission['updated_at'] = $now;
+        }
+
+        DB::table('permissions')->insert($permissions);
+    }
+}

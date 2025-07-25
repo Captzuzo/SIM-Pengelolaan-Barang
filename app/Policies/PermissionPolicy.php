@@ -14,11 +14,23 @@ class PermissionPolicy
 
     public function viewAny(User $user): bool
     {
+        // if ($user->hasPermissionTo('View Permission')) {
+        //     return true;
+        // }
+        // return false;
+        // return $user->hasRole('Admin');
+
+        // Jika role Admin, izinkan semua
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+
+        // Jika bukan admin, cek permission tertentu
         if ($user->hasPermissionTo('View Permission')) {
             return true;
         }
+
         return false;
-        // return $user->hasRole('Admin');
     }
 
     /**
@@ -34,7 +46,18 @@ class PermissionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasRole('Admin');
+        // return $user->hasRole('Admin');
+        // Jika role Admin, izinkan semua
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+
+        // Jika bukan admin, cek permission tertentu
+        if ($user->hasPermissionTo('Create Permission')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -42,7 +65,18 @@ class PermissionPolicy
      */
     public function update(User $user, Permission $permission): bool
     {
-        return $user->hasRole('Admin');
+        // return $user->hasRole('Admin');
+        // Jika role Admin, izinkan semua
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+
+        // Jika bukan admin, cek permission tertentu
+        if ($user->hasPermissionTo('Edit Permission')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -50,7 +84,18 @@ class PermissionPolicy
      */
     public function delete(User $user, Permission $permission): bool
     {
-        return $user->hasRole('Admin');
+        // return $user->hasRole('Admin');
+        // Jika role Admin, izinkan semua
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+
+        // Jika bukan admin, cek permission tertentu
+        if ($user->hasPermissionTo('Delete Permission')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

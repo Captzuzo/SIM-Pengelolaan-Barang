@@ -21,7 +21,7 @@ class RoleResource extends Resource
 {
     protected static ?string $model = ModelsRole::class;
     protected static ?string $navigationGroup = 'Setting';
-
+    protected static ?string $slug = 'role';
     protected static ?string $navigationIcon = 'heroicon-o-finger-print';
     protected static ?int $navigationSort = 99;
 

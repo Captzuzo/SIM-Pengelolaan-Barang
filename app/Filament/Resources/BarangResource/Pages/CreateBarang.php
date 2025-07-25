@@ -14,6 +14,11 @@ class CreateBarang extends CreateRecord
     {
         return $this->getResource()::getUrl('index');
     }
+
+    public static function getSlug(): string
+    {
+        return 'buat'; // ⬅️ ini akan ubah URL dari /create ke /buat
+    }
     protected function getSavedNotificationTitle(): ?string
     {
         return 'Barang Berhasil Diperbarui';

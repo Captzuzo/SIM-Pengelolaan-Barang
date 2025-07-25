@@ -13,9 +13,21 @@ class BarangPolicy
      */
     public function viewAny(User $user): bool
     {
+        // if ($user->hasPermissionTo('View Barang')) {
+        //     return true;
+        // }
+        // return false;
+
+        // Jika role Admin, izinkan semua
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+
+        // Jika bukan admin, cek permission tertentu
         if ($user->hasPermissionTo('View Barang')) {
             return true;
         }
+
         return false;
     }
 
@@ -33,9 +45,25 @@ class BarangPolicy
      */
     public function create(User $user): bool
     {
-        if ($user->hasPermissionTo('Create')) {
+        // if ($user->hasPermissionTo('Create')) {
+        //     return true;
+        // }
+        // return false;
+
+        // Jika role Admin, izinkan semua
+        if ($user->hasRole('Admin')) {
             return true;
         }
+
+        // if ($user->hasRole('Kasir')) {
+        //     return true;
+        // }
+
+        // Jika bukan admin, cek permission tertentu
+        if ($user->hasPermissionTo('Create Barang')) {
+            return true;
+        }
+
         return false;
     }
 
@@ -44,9 +72,21 @@ class BarangPolicy
      */
     public function update(User $user, Barang $barang): bool
     {
-        if ($user->hasPermissionTo('Edit')) {
+        // if ($user->hasPermissionTo('Edit')) {
+        //     return true;
+        // }
+        // return false;
+
+        // Jika role Admin, izinkan semua
+        if ($user->hasRole('Admin')) {
             return true;
         }
+
+        // Jika bukan admin, cek permission tertentu
+        if ($user->hasPermissionTo('Edit Barang')) {
+            return true;
+        }
+
         return false;
     }
 
@@ -55,9 +95,21 @@ class BarangPolicy
      */
     public function delete(User $user, Barang $barang): bool
     {
-        if ($user->hasPermissionTo('Delete')) {
+        // if ($user->hasPermissionTo('Delete')) {
+        //     return true;
+        // }
+        // return false;
+
+        // Jika role Admin, izinkan semua
+        if ($user->hasRole('Admin')) {
             return true;
         }
+
+        // Jika bukan admin, cek permission tertentu
+        if ($user->hasPermissionTo('Delete Barang')) {
+            return true;
+        }
+
         return false;
     }
 

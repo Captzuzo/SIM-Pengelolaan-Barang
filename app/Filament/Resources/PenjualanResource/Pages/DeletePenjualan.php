@@ -3,11 +3,13 @@
 namespace App\Filament\Resources\PenjualanResource\Pages;
 
 use App\Filament\Resources\PenjualanResource;
+use App\Models\Barang;
 use Filament\Actions;
-use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\EditRecord;
 
-class CreatePenjualan extends CreateRecord
+class EditPenjualan extends EditRecord
 {
+
     protected static string $resource = PenjualanResource::class;
     protected function getRedirectUrl(): string
     {
@@ -15,6 +17,6 @@ class CreatePenjualan extends CreateRecord
     }
     protected function getCreatedNotificationTitle(): ?string
     {
-        return 'Penjualan Berhasil Dibuat';
+        return 'Penjualan Berhasil Dihapus';
     }
 }

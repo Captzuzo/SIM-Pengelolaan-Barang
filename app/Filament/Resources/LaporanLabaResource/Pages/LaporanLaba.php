@@ -27,14 +27,42 @@ class LaporanLabaPage extends Page implements Forms\Contracts\HasForms
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
     protected static ?string $title = 'Laporan Laba';
     protected static ?string $slug = 'laporan-laba';
-    protected static ?int $navigationSort = 90;
+    protected static ?int $navigationSort = 20;
 
     protected static string $view = 'filament.pages.laporan.laporan-laba';
 
 
+    // public function mount(): void
+    // {
+    //     $this->form->fill();
+    // }
+
     public function mount(): void
     {
+        // if (! static::canAccess()) {
+        //     abort(403, 'Akses ditolak: Anda tidak memiliki izin untuk melihat Laporan Harian.');
+        // }
+
         $this->form->fill();
+    }
+
+    public static function canAccess(): bool
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+
+        if ($user->hasPermissionTo('View Laporan Harian')) {
+            return true;
+        }
+
+        return false;
     }
 
     protected function getFormSchema(): array

@@ -8,6 +8,6 @@ use Filament\Resources\Pages\Page;
 class LaporaTahunan extends Page
 {
     protected static string $resource = LaporanTahunanResource::class;
-
+    protected static ?int $navigationSort = 25;
     protected static string $view = 'filament.resources.laporan-tahunan-resource.pages.lapora-tahunan';
 }

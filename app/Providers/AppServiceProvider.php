@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Policies\UserPolicy;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Penjualan;
+use App\Observers\PenjualanObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Penjualan::observe(PenjualanObserver::class);
         // Gate::before(function ($user, $ability) {
         //     return $user->hasRole('Admin') ? true : null;
         // });

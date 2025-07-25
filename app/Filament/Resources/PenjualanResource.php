@@ -23,13 +23,15 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
+use Filament\Notifications\Notification;
 
 class PenjualanResource extends Resource
 {
     protected static ?string $model = Penjualan::class;
     protected static ?string $navigationGroup = 'Transaksi';
     protected static ?string $navigationLabel = 'Penjualan';
-    protected static ?int $navigationSort = 5;
+    protected static ?string $slug = 'penjualan';
+    protected static ?int $navigationSort = 11;
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
     public static function form(Form $form): Form
@@ -94,6 +96,11 @@ class PenjualanResource extends Resource
                                     ->required()
                                     ->reactive()
                                     ->afterStateUpdated(function ($state, callable $get, callable $set) {
+                                        $barang = \App\Models\Barang::find($get('barang_id'));
+                                        if ($barang && $state > $barang->stok) {
+                                            $set('qty', $barang->stok);
+                                            notification()->danger('Stok tidak mencukupi, stok tersedia: ' . $barang->stok);
+                                        }
                                         $set('subtotal', (int)$state * (int)$get('harga_satuan'));
                                     }),
 
@@ -115,11 +122,12 @@ class PenjualanResource extends Resource
                             ])
                             ->columns(4)
                             ->columnSpan(2)
+                            ->debounce(500)
                             ->createItemButtonLabel('Tambah Barang')
                             ->afterStateUpdated(function (callable $get, callable $set) {
                                 $total = collect($get('details'))->pluck('subtotal')->sum();
                                 $set('total', $total);
-                                // $set('sisa', $total - (int)$get('bayar'));
+                                $set('sisa', $total - (int)$get('bayar'));
                             }),
 
 
@@ -127,14 +135,14 @@ class PenjualanResource extends Resource
                             ->label('Total')
                             ->numeric()
                             ->required()
+                            ->reactive()
                             ->disabled()
-                            ->dehydrated()
-
-                            ->afterStateUpdated(function (callable $get, callable $set) {
-                                $total = collect($get('details'))->pluck('subtotal')->sum();
-                                $set('total', $total);
-                                $set('sisa', $total - (int)$get('bayar'));
-                            }),
+                            ->dehydrated(),
+                        // ->afterStateUpdated(function (callable $get, callable $set) {
+                        //     $total = collect($get('details'))->pluck('subtotal')->sum();
+                        //     $set('total', $total);
+                        //     $set('sisa', $total - (int)$get('bayar'));
+                        // }),
 
                         TextInput::make('bayar')
                             ->label('Bayar')
@@ -143,13 +151,12 @@ class PenjualanResource extends Resource
                             ->columnSpan(2)
                             ->minValue(0)
                             ->reactive()
+                            ->debounce(1000)
                             ->afterStateUpdated(function ($state, callable $get, callable $set) {
                                 $total = (int) $get('total');
 
                                 if ((int) $state <= 0) {
-                                    $set('sisa', $total - $state); // hasilnya negatif
-                                } else {
-                                    $set('sisa', (int) $state - $total); // bisa negatif/positif
+                                    $set('sisa', (int) $state - $total);
                                 }
                             }),
 

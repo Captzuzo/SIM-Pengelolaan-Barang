@@ -36,9 +36,9 @@
             </thead>
             <tbody>
                 @foreach ($data['penjualans'] as $item)
-                    <tr>
+                    <tr class="text-center">
                         <td class="border px-2 py-1">{{ $item->no_invoice }}</td>
-                        <td class="border px-2 py-1">{{ \Carbon\Carbon::parse($item->tanggal)->format('d-m-Y') }}</td>
+                        <td class="border px-2 py-1">{{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}</td>
                         <td class="border px-2 py-1">Rp {{ number_format($item->total, 0, ',', '.') }}</td>
                     </tr>
                 @endforeach
