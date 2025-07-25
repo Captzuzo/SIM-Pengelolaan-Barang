@@ -16,10 +16,12 @@ class CetakLaporanStokController extends Controller
             return $barang->stok * $barang->harga_beli;
         });
 
-        $pdf = Pdf::loadView('pdf.laporan-stok', [
+        $html = view('pdf.laporan-stok', [
             'barangs' => $barangs,
             'total_nilai_stok' => $total_nilai_stok,
-        ]);
+        ])->render();
+
+        $pdf = Pdf::loadHTML($html);
 
         return $pdf->download('laporan-stok.pdf');
     }

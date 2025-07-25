@@ -58,4 +58,11 @@ class LaporanStokPage extends Page
             return $barang->stok * $barang->harga_beli;
         });
     }
+    public function getViewData(): array
+    {
+        $barangs = Barang::with('kategori')->get();
+        $total_nilai_stok = $barangs->sum(fn($barang) => $barang->stok * $barang->harga_beli);
+
+        return compact('barangs', 'total_nilai_stok');
+    }
 }

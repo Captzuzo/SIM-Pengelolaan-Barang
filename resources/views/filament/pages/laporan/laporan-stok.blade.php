@@ -30,7 +30,7 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-700">
-                        @foreach($data['barangs'] as $index => $barang)
+                        @foreach($barangs as $index => $barang)
                             <tr class="hover:bg-gray-800/70 transition duration-200 ease-in-out">
                                 <td class="px-4 py-2">{{ $index + 1 }}</td>
                                 <td class="px-4 py-2 font-semibold text-blue-300">{{ $barang->nama_barang }}</td>

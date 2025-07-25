@@ -14,6 +14,11 @@ class Kategori extends Model
         'nama_kategori',
     ];
 
+    public function barangs()
+    {
+        return $this->belongsTo(Barang::class);
+    }
+
     public static function mutateFormDataBeforeCreate(array $data): array
     {
         $nama = $data['nama_kategori'] ?? '';

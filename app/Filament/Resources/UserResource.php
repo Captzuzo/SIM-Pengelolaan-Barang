@@ -35,6 +35,10 @@ class UserResource extends Resource
                         ->required()
                         ->unique(ignoreRecord: true)
                         ->maxLength(255),
+                    Forms\Components\TextInput::make('username')
+                        ->required()
+                        ->unique(ignoreRecord: true)
+                        ->maxLength(255),
                     Forms\Components\TextInput::make('email')
                         ->email()
                         ->required()
@@ -69,6 +73,8 @@ class UserResource extends Resource
                         return ($livewire->getTableRecords()->search($record) + 1);
                     }),
                 Tables\Columns\TextColumn::make('name')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('username')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
