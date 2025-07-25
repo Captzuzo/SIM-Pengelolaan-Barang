@@ -19,7 +19,7 @@ class LaporanHarianPage extends Page
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
     protected static ?string $title = 'Laporan Harian';
     protected static ?string $slug = 'laporan-harian';
-    protected static ?int $navigationSort = 19;
+    protected static ?int $navigationSort = 21;
 
     protected static string $view = 'filament.pages.laporan.laporan-harian';
     // protected static string $view = 'filament.pages.laporan.laporan-stok';

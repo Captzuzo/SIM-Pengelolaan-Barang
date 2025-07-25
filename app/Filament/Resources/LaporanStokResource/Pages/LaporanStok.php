@@ -14,7 +14,7 @@ class LaporanStokPage extends Page
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
     protected static ?string $title = 'Laporan Stok';
     protected static ?string $slug = 'laporan-stok';
-    protected static ?int $navigationSort = 24;
+    protected static ?int $navigationSort = 20;
     protected static string $view = 'filament.pages.laporan.laporan-stok';
 
     public $data = [];
@@ -26,9 +26,6 @@ class LaporanStokPage extends Page
 
     public function mount(): void
     {
-        if (! static::canAccess()) {
-            abort(403, 'Akses ditolak: Anda tidak memiliki izin untuk melihat Laporan Harian.');
-        }
 
         $this->form->fill();
     }
@@ -45,7 +42,7 @@ class LaporanStokPage extends Page
             return true;
         }
 
-        if ($user->hasPermissionTo('View Laporan Harian')) {
+        if ($user->hasPermissionTo('View Laporan Stok')) {
             return true;
         }
 

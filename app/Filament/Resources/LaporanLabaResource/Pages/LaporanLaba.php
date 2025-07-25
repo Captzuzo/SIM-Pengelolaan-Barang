@@ -27,7 +27,7 @@ class LaporanLabaPage extends Page implements Forms\Contracts\HasForms
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
     protected static ?string $title = 'Laporan Laba';
     protected static ?string $slug = 'laporan-laba';
-    protected static ?int $navigationSort = 20;
+    protected static ?int $navigationSort = 25;
 
     protected static string $view = 'filament.pages.laporan.laporan-laba';
 

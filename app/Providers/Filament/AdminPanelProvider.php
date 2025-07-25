@@ -2,8 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Laporan\LaporanBulananPage;
 use App\Filament\Pages\Laporan\LaporanHarianPage;
 use App\Filament\Pages\Laporan\LaporanLabaPage;
+use App\Filament\Pages\Laporan\LaporanTahunanPage;
 use App\Filament\Resources\BarangResource;
 use App\Filament\Resources\LaporanStokResource\Pages\LaporanStokPage;
 use App\Models\Barang;
@@ -51,12 +53,17 @@ class AdminPanelProvider extends PanelProvider
                 LaporanStokPage::class,
                 LaporanLabaPage::class,
                 LaporanHarianPage::class,
+                LaporanBulananPage::class,
+                LaporanTahunanPage::class,
             ])
             ->spa()
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                // Widgets\AccountWidget::class,
+                // Widgets\FilamentInfoWidget::class,
+                \App\Filament\Widgets\DashboardOverview::class,
+                // \App\Filament\Widgets\BarangStokMinimOverview::class,
+                \App\Filament\Widgets\PelangganHutangOverview::class,
             ])
             ->middleware([
                 EncryptCookies::class,
