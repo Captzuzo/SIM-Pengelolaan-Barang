@@ -7,6 +7,7 @@ use App\Filament\Resources\KategoriResource\RelationManagers;
 use App\Models\Kategori;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -29,17 +30,19 @@ class KategoriResource extends Resource
             ->schema([
                 Card::make()
                     ->schema([
-                        Forms\Components\TextInput::make('kode_kategori')
-                            ->required()
-                            ->maxLength(255)
-                            ->readOnly(),
+                        TextInput::make('kode_kategori')
+                            ->label('Kode Kategori')
+                            ->readOnly()
+                            ->maxLength(255),
 
-                        Forms\Components\TextInput::make('nama_kategori')
+                        TextInput::make('nama_kategori')
+                            ->label('Nama Kategori')
                             ->required()
                             ->maxLength(255)
-                            ->live() // Tambahkan ini agar bisa trigger afterStateUpdated
+                            ->unique()
+                            ->live(onBlur: true) // agar hanya update saat blur
                             ->afterStateUpdated(function (string $state, callable $set) {
-                                $words = explode(' ', $state);
+                                $words = preg_split('/\s+/', trim($state));
                                 $code = '';
 
                                 if (count($words) === 1) {
@@ -52,7 +55,7 @@ class KategoriResource extends Resource
 
                                 $set('kode_kategori', $code);
                             }),
-                    ])
+                    ]),
             ]);
     }
 
@@ -98,5 +101,33 @@ class KategoriResource extends Resource
             'create' => Pages\CreateKategori::route('/create'),
             'edit' => Pages\EditKategori::route('/{record}/edit'),
         ];
+    }
+
+    public static function mutateFormDataBeforeCreate(array $data): array
+    {
+        return self::generateKodeKategori($data);
+    }
+
+    public static function mutateFormDataBeforeSave(array $data): array
+    {
+        return self::generateKodeKategori($data);
+    }
+
+    protected static function generateKodeKategori(array $data): array
+    {
+        $nama = $data['nama_kategori'] ?? '';
+        $words = preg_split('/\s+/', trim($nama));
+        $code = '';
+
+        if (count($words) === 1) {
+            $code = strtoupper(substr($words[0], 0, 3));
+        } elseif (count($words) === 2) {
+            $code = strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 2));
+        } else {
+            $code = strtoupper(substr($words[0], 0, 1) . substr($words[1], 0, 1) . substr($words[2], 0, 1));
+        }
+
+        $data['kode_kategori'] = $code;
+        return $data;
     }
 }

@@ -12,6 +12,7 @@ class Penjualan extends Model
         'total',
         'tanggal',
         'bayar',
+        'kembalian',
         'sisa',
         'status_pembayaran',
     ];
@@ -40,6 +41,18 @@ class Penjualan extends Model
     {
         static::creating(function ($model) {
             $model->sisa = $model->total - $model->bayar;
+        });
+
+        static::saving(function ($penjualan) {
+            // Hitung sisa otomatis
+            $penjualan->sisa = $penjualan->total - $penjualan->bayar;
+
+            // Tentukan status pembayaran otomatis
+            if ($penjualan->bayar >= $penjualan->total) {
+                $penjualan->status_pembayaran = 'lunas';
+            } else {
+                $penjualan->status_pembayaran = 'belum lunas';
+            }
         });
     }
 }

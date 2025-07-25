@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use Filament\Notifications\Notification;
+use Filament\Forms\Set;
+use Filament\Forms\Get;
 
 class PenjualanResource extends Resource
 {
@@ -57,7 +59,7 @@ class PenjualanResource extends Resource
                             ->afterStateUpdated(function ($state, callable $set) {
                                 $pelanggan = \App\Models\Pelanggan::find($state);
                                 if ($pelanggan) {
-                                    $tanggal = now()->format('Ymd');
+                                    $tanggal = now()->format('dmY');
                                     $countToday = \App\Models\Penjualan::whereDate('created_at', now()->toDateString())->count();
                                     $urut = str_pad($countToday + 1, 3, '0', STR_PAD_LEFT);
                                     $nama = strtoupper(str_replace(' ', '', $pelanggan->nama));
@@ -117,19 +119,18 @@ class PenjualanResource extends Resource
                                     ->label('Subtotal')
                                     ->numeric()
                                     ->disabled()
-                                    ->dehydrated() // ⬅️ WAJIB AGAR FIELD INI TERKIRIM SAAT SUBMIT
+                                    ->dehydrated()
                                     ->required(),
                             ])
                             ->columns(4)
                             ->columnSpan(2)
-                            ->debounce(500)
-                            ->createItemButtonLabel('Tambah Barang')
+                            ->reactive()
                             ->afterStateUpdated(function (callable $get, callable $set) {
-                                $total = collect($get('details'))->pluck('subtotal')->sum();
+                                $details = collect($get('details'));
+                                $total = $details->sum('subtotal');
                                 $set('total', $total);
-                                $set('sisa', $total - (int)$get('bayar'));
-                            }),
-
+                            })
+                            ->createItemButtonLabel('Tambah Barang'),
 
                         TextInput::make('total')
                             ->label('Total')
@@ -137,12 +138,16 @@ class PenjualanResource extends Resource
                             ->required()
                             ->reactive()
                             ->disabled()
-                            ->dehydrated(),
-                        // ->afterStateUpdated(function (callable $get, callable $set) {
-                        //     $total = collect($get('details'))->pluck('subtotal')->sum();
-                        //     $set('total', $total);
-                        //     $set('sisa', $total - (int)$get('bayar'));
-                        // }),
+                            ->dehydrated()
+                            ->placeholder(function (Set $set, Get $get) {
+                                $details = collect($get('details'))
+                                    ->pluck('subtotal')->sum();
+                                if ($details == null) {
+                                    $set('total', 0);
+                                } else {
+                                    $set('total', $details);
+                                }
+                            }),
 
                         TextInput::make('bayar')
                             ->label('Bayar')
@@ -154,30 +159,63 @@ class PenjualanResource extends Resource
                             ->debounce(1000)
                             ->afterStateUpdated(function ($state, callable $get, callable $set) {
                                 $total = (int) $get('total');
+                                $bayar = (int) $state;
+                                $set('sisa', max(0, $total - $bayar));
+                                $set('kembalian', max(0, $bayar - $total));
+                            }),
 
-                                if ((int) $state <= 0) {
-                                    $set('sisa', (int) $state - $total);
-                                }
+                        TextInput::make('kembalian')
+                            ->label('Kembalian')
+                            ->numeric()
+                            ->disabled()
+                            ->columnSpan(2)
+                            ->visible(fn(callable $get) => (int)$get('bayar') >= (int)$get('total'))
+                            ->dehydrated()
+                            ->dehydrateStateUsing(function ($state) {
+                                return max(0, (int) $state); // Tidak menyimpan nilai negatif
                             }),
 
                         TextInput::make('sisa')
                             ->label('Sisa')
                             ->numeric()
-                            ->minValue(0)
-                            ->columnSpan(2)
                             ->disabled()
-                            ->dehydrated(),
-
-                        Select::make('status_pembayaran')
-                            ->label('Status Pembayaran')
                             ->columnSpan(2)
-                            ->options([
-                                'lunas' => 'Lunas',
-                                'belum bayar' => 'Belum Bayar',
-                            ])
-                            ->required(),
+                            ->visible(fn(callable $get) => (int)$get('bayar') <= (int)$get('total'))
+                            ->dehydrated()
+                            ->dehydrateStateUsing(function ($state) {
+                                return max(0, (int) $state); // Tidak menyimpan nilai negatif
+                            }),
+
+                        // Select::make('status_pembayaran')
+                        //     ->label('Status Pembayaran')
+                        //     ->columnSpan(2)
+                        //     ->options([
+                        //         'lunas' => 'Lunas',
+                        //         'belum bayar' => 'Belum Bayar',
+                        //     ])
+                        //     ->required(),
+                        TextInput::make('status_pembayaran')
+                            ->label('Status Pembayaran')
+                            ->disabled(),
                     ])
             ]);
+    }
+
+    public static function mutateFormDataBeforeCreate(array $data): array
+    {
+        $data['sisa'] = $data['total'] - $data['bayar'];
+        $data['status_pembayaran'] = $data['bayar'] >= $data['total'] ? 'lunas' : 'belum lunas';
+
+        return $data;
+    }
+
+    // ⬇️ Otomatisasi sebelum update
+    public static function mutateFormDataBeforeSave(array $data): array
+    {
+        $data['kembalian'] = $data['bayar'] - $data['total'];
+        $data['status_pembayaran'] = $data['bayar'] >= $data['total'] ? 'lunas' : 'belum lunas';
+
+        return $data;
     }
 
     public static function table(Table $table): Table
