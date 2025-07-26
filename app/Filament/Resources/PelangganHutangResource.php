@@ -57,6 +57,7 @@ class PelangganHutangResource extends Resource
                     ->money('IDR', true),
 
                 Tables\Columns\TextColumn::make('sisa')
+                    ->label('Piutang')
                     ->money('IDR', true),
 
                 BadgeColumn::make('status_pembayaran')
@@ -77,7 +78,7 @@ class PelangganHutangResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

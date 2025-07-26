@@ -252,11 +252,11 @@ class PenjualanResource extends Resource
                 Tables\Columns\TextColumn::make('bayar')
                     ->money('IDR', true),
 
-                Tables\Columns\TextColumn::make('sisa')
-                    ->money('IDR', true),
+                // Tables\Columns\TextColumn::make('sisa')
+                //     ->money('IDR', true),
 
-                Tables\Columns\TextColumn::make('kembalian')
-                    ->money('IDR', true),
+                // Tables\Columns\TextColumn::make('kembalian')
+                //     ->money('IDR', true),
 
                 BadgeColumn::make('status_pembayaran')
                     ->colors([
