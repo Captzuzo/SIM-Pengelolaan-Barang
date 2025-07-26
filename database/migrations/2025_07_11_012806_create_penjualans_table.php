@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('diskon')->default(0);
             $table->integer('bayar');
             $table->integer('sisa');
+            $table->integer('kembalian');
             $table->enum('status_pembayaran', ['lunas', 'belum bayar'])->default('belum bayar');
             $table->date('tanggal');
             $table->timestamps();

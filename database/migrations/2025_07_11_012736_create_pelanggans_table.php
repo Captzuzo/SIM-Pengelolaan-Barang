@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->string('no_hp');
-            $table->string('provinces');
-            $table->string('regencies');
-            $table->string('districts');
-            $table->string('villages');
+            $table->string('province_id');
+            $table->string('regency_id');
+            $table->string('district_id');
+            $table->string('village_id');
             $table->text('alamat_lengkap');
             $table->timestamps();
         });

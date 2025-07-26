@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class PelangganHutangOverview extends BaseWidget
 {
+    protected static ?string $label = 'Pelanggan Hutang';
     protected function getTableQuery(): Builder
     {
         return Pelanggan::whereHas('penjualans', function ($query) {
