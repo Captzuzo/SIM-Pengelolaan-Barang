@@ -40,6 +40,8 @@ class PelangganResource extends Resource
                         Forms\Components\TextInput::make('nama')
                             ->required(),
                         Forms\Components\TextInput::make('no_hp')
+                            ->minLength(11)
+                            ->maxLength(12)
                             ->numeric()
                             ->required(),
 

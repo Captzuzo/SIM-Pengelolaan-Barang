@@ -41,19 +41,21 @@ class Penjualan extends Model
     protected static function booted()
     {
         static::creating(function ($model) {
-            $model->sisa = $model->total - $model->bayar;
+            $total = (int) $model->total;
+            $bayar = (int) $model->bayar;
+
+            $model->sisa = max(0, $total - $bayar);
+            $model->kembalian = max(0, $bayar - $total);
+            $model->status_pembayaran = $bayar >= $total ? 'lunas' : 'belum bayar';
         });
 
-        static::saving(function ($penjualan) {
-            // Hitung sisa otomatis
-            $penjualan->sisa = $penjualan->total - $penjualan->bayar;
+        static::saving(function ($model) {
+            $total = (int) $model->total;
+            $bayar = (int) $model->bayar;
 
-            // Tentukan status pembayaran otomatis
-            if ($penjualan->bayar >= $penjualan->total) {
-                $penjualan->status_pembayaran = 'lunas';
-            } else {
-                $penjualan->status_pembayaran = 'belum lunas';
-            }
+            $model->sisa = max(0, $total - $bayar);
+            $model->kembalian = max(0, $bayar - $total);
+            $model->status_pembayaran = $bayar >= $total ? 'lunas' : 'belum bayar';
         });
     }
 }

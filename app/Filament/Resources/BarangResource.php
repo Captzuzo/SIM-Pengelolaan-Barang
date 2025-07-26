@@ -62,7 +62,7 @@ class BarangResource extends Resource
                                 $nomor = str_pad($count, 3, '0', STR_PAD_LEFT);
 
                                 // Format kode_barang
-                                $kodeBarang = "{$kodeKategori}-BRG-{$nomor}";
+                                $kodeBarang = "BRG-{$kodeKategori}-{$nomor}";
 
                                 $set('kode_barang', $kodeBarang);
                             }),

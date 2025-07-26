@@ -172,8 +172,20 @@ class PenjualanResource extends Resource
                             ->afterStateUpdated(function ($state, callable $get, callable $set) {
                                 $total = (int) $get('total');
                                 $bayar = (int) $state;
-                                $set('sisa', max(0, $total - $bayar));
-                                $set('kembalian', max(0, $bayar - $total));
+
+                                if ($bayar < $total) {
+                                    $set('sisa', $total - $bayar);
+                                    $set('kembalian', 0);
+                                    $set('status_pembayaran', 'belum bayar');
+                                } elseif ($bayar > $total) {
+                                    $set('sisa', 0);
+                                    $set('kembalian', $bayar - $total);
+                                    $set('status_pembayaran', 'lunas');
+                                } else {
+                                    $set('sisa', 0);
+                                    $set('kembalian', 0);
+                                    $set('status_pembayaran', 'lunas');
+                                }
                             }),
 
                         TextInput::make('kembalian')
@@ -181,33 +193,24 @@ class PenjualanResource extends Resource
                             ->numeric()
                             ->disabled()
                             ->columnSpan(2)
-                            ->visible(fn(callable $get) => (int)$get('bayar') >= (int)$get('total'))
-                            ->dehydrated()
-                            ->dehydrateStateUsing(function ($state) {
-                                return max(0, (int) $state); // Tidak menyimpan nilai negatif
-                            }),
+                            ->visible(fn(callable $get) => (int) $get('bayar') >= (int) $get('total'))
+                            ->dehydrated(),
 
                         TextInput::make('sisa')
-                            ->label('Sisa')
+                            ->label('Piutang')
                             ->numeric()
                             ->disabled()
                             ->columnSpan(2)
-                            ->visible(fn(callable $get) => (int)$get('bayar') <= (int)$get('total'))
-                            ->dehydrated()
-                            ->dehydrateStateUsing(function ($state) {
-                                return max(0, (int) $state); // Tidak menyimpan nilai negatif
-                            }),
+                            ->formatStateUsing(fn($state) => 'Rp ' . number_format(max(0, $state), 0, ',', '.'))
+                            // ->formatStateUsing(fn($state) => max(0, $state))
+                            ->visible(fn(callable $get) => (int) $get('bayar') <= (int) $get('total'))
+                            ->dehydrated(),
 
-                        // Select::make('status_pembayaran')
-                        //     ->label('Status Pembayaran')
-                        //     ->columnSpan(2)
-                        //     ->options([
-                        //         'lunas' => 'Lunas',
-                        //         'belum bayar' => 'Belum Bayar',
-                        //     ])
-                        //     ->required(),
                         TextInput::make('status_pembayaran')
                             ->label('Status Pembayaran')
+                            ->default('belum bayar')
+                            ->dehydrated()
+                            ->rules(['in:lunas,belum bayar'])
                             ->disabled(),
                     ])
             ]);
@@ -215,20 +218,21 @@ class PenjualanResource extends Resource
 
     public static function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['sisa'] = $data['total'] - $data['bayar'];
-        $data['status_pembayaran'] = $data['bayar'] >= $data['total'] ? 'lunas' : 'belum lunas';
+        $data['sisa'] = max(0, (int) $data['total'] - (int) $data['bayar']);
+        $data['kembalian'] = max(0, (int) $data['bayar'] - (int) $data['total']);
+        $data['status_pembayaran'] = $data['bayar'] >= $data['total'] ? 'lunas' : 'belum bayar';
 
         return $data;
     }
 
-    // ⬇️ Otomatisasi sebelum update
     public static function mutateFormDataBeforeSave(array $data): array
     {
-        $data['kembalian'] = $data['bayar'] - $data['total'];
-        $data['status_pembayaran'] = $data['bayar'] >= $data['total'] ? 'lunas' : 'belum lunas';
-
+        $data['sisa'] = max(0, (int) $data['total'] - (int) $data['bayar']);
+        $data['kembalian'] = max(0, (int) $data['bayar'] - (int) $data['total']); // ✅ Tambahkan ini
+        $data['status_pembayaran'] = $data['bayar'] >= $data['total'] ? 'lunas' : 'belum bayar';
         return $data;
     }
+
 
     public static function table(Table $table): Table
     {
@@ -245,11 +249,14 @@ class PenjualanResource extends Resource
                 Tables\Columns\TextColumn::make('total')
                     ->money('IDR', true),
 
-                // Tables\Columns\TextColumn::make('bayar')
-                //     ->money('IDR', true),
+                Tables\Columns\TextColumn::make('bayar')
+                    ->money('IDR', true),
 
-                // Tables\Columns\TextColumn::make('sisa')
-                //     ->money('IDR', true),
+                Tables\Columns\TextColumn::make('sisa')
+                    ->money('IDR', true),
+
+                Tables\Columns\TextColumn::make('kembalian')
+                    ->money('IDR', true),
 
                 BadgeColumn::make('status_pembayaran')
                     ->colors([
