@@ -20,6 +20,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\File;
 
 class PelangganResource extends Resource
 {
@@ -42,44 +43,106 @@ class PelangganResource extends Resource
                             ->numeric()
                             ->required(),
 
+                        // PROVINSI
                         Select::make('provinces')
                             ->label('Provinsi')
                             ->required()
-                            ->options(\App\Models\Province::pluck('name', 'id'))
+                            ->options(function () {
+                                $json = json_decode(File::get(database_path('data/list_of_area/provinces.json')), true);
+                                return collect($json)->pluck('name', 'id')->toArray();
+                            })
                             ->searchable()
+                            ->getSearchResultsUsing(function (string $search): array {
+                                $data = json_decode(File::get(database_path('data/list_of_area/provinces.json')), true);
+                                return collect($data)
+                                    ->filter(fn($item) => str_contains(strtolower($item['name']), strtolower($search)))
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->getOptionLabelUsing(fn($value) => collect(
+                                json_decode(File::get(database_path('data/list_of_area/provinces.json')), true)
+                            )->firstWhere('id', $value)['name'] ?? null)
                             ->reactive()
                             ->afterStateUpdated(fn($state, callable $set) => $set('regencies', null)),
 
+                        // KABUPATEN/KOTA
                         Select::make('regencies')
                             ->label('Kabupaten/Kota')
                             ->required()
-                            ->options(
-                                fn(callable $get) =>
-                                \App\Models\Regency::where('province_id', $get('provinces'))->pluck('name', 'id')
-                            )
+                            ->options(function (callable $get) {
+                                $provinceId = $get('provinces');
+                                if (!$provinceId) return [];
+                                $json = json_decode(File::get(database_path('data/list_of_area/regencies.json')), true);
+                                return collect($json)
+                                    ->where('province_id', $provinceId)
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
                             ->searchable()
+                            ->getSearchResultsUsing(function (string $search) {
+                                $json = json_decode(File::get(database_path('data/list_of_area/regencies.json')), true);
+                                return collect($json)
+                                    ->filter(fn($item) => str_contains(strtolower($item['name']), strtolower($search)))
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->getOptionLabelUsing(fn($value) => collect(
+                                json_decode(File::get(database_path('data/list_of_area/regencies.json')), true)
+                            )->firstWhere('id', $value)['name'] ?? null)
                             ->reactive()
                             ->afterStateUpdated(fn($state, callable $set) => $set('districts', null)),
 
+                        // KECAMATAN
                         Select::make('districts')
                             ->label('Kecamatan')
                             ->required()
-                            ->options(
-                                fn(callable $get) =>
-                                \App\Models\District::where('regency_id', $get('regencies'))->pluck('name', 'id')
-                            )
+                            ->options(function (callable $get) {
+                                $regencyId = $get('regencies');
+                                if (!$regencyId) return [];
+                                $json = json_decode(File::get(database_path('data/list_of_area/districts.json')), true);
+                                return collect($json)
+                                    ->where('regency_id', $regencyId)
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
                             ->searchable()
+                            ->getSearchResultsUsing(function (string $search) {
+                                $json = json_decode(File::get(database_path('data/list_of_area/districts.json')), true);
+                                return collect($json)
+                                    ->filter(fn($item) => str_contains(strtolower($item['name']), strtolower($search)))
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->getOptionLabelUsing(fn($value) => collect(
+                                json_decode(File::get(database_path('data/list_of_area/districts.json')), true)
+                            )->firstWhere('id', $value)['name'] ?? null)
                             ->reactive()
                             ->afterStateUpdated(fn($state, callable $set) => $set('villages', null)),
 
+                        // DESA
                         Select::make('villages')
                             ->label('Desa')
                             ->required()
-                            ->options(
-                                fn(callable $get) =>
-                                \App\Models\Village::where('district_id', $get('districts'))->pluck('name', 'id')
-                            )
-                            ->searchable(),
+                            ->options(function (callable $get) {
+                                $districtId = $get('districts');
+                                if (!$districtId) return [];
+                                $json = json_decode(File::get(database_path('data/list_of_area/villages.json')), true);
+                                return collect($json)
+                                    ->where('district_id', $districtId)
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->searchable()
+                            ->getSearchResultsUsing(function (string $search) {
+                                $json = json_decode(File::get(database_path('data/list_of_area/villages.json')), true);
+                                return collect($json)
+                                    ->filter(fn($item) => str_contains(strtolower($item['name']), strtolower($search)))
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->getOptionLabelUsing(fn($value) => collect(
+                                json_decode(File::get(database_path('data/list_of_area/villages.json')), true)
+                            )->firstWhere('id', $value)['name'] ?? null),
 
                         Forms\Components\Textarea::make('alamat_lengkap')
                             ->required(),

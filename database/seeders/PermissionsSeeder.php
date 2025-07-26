@@ -42,6 +42,15 @@ class PermissionsSeeder extends Seeder
             ['name' => 'View Role'],
             ['name' => 'View Permission'],
             ['name' => 'View Kategori'],
+            ['name' => 'View Barang'],
+            ['name' => 'View Pelanggan'],
+            ['name' => 'View Penjualan'],
+            ['name' => 'View Pelanggan Hutang'],
+            ['name' => 'View Laporan Laba'],
+            ['name' => 'View Laporan Stok'],
+            ['name' => 'View Laporan Harian'],
+            ['name' => 'View Laporan Bulanan'],
+            ['name' => 'View Laporan Tahunan'],
         ];
 
         foreach ($permissions as &$permission) {
