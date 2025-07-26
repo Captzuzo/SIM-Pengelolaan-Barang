@@ -9,6 +9,7 @@ class Penjualan extends Model
     protected $fillable = [
         'no_invoice',
         'pelanggan_id',
+        'user_id',
         'total',
         'tanggal',
         'bayar',

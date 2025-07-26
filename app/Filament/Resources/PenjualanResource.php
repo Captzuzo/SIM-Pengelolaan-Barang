@@ -25,7 +25,9 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
 use Filament\Notifications\Notification;
 use Filament\Forms\Set;
+use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Get;
+use Filament\Forms\Components\Hidden;
 
 class PenjualanResource extends Resource
 {
@@ -42,9 +44,19 @@ class PenjualanResource extends Resource
             ->schema([
                 Card::make()
                     ->schema([
+                        Hidden::make('user_id')
+                            ->default(fn() => auth()->id()),
+
+                        TextInput::make('kasir')
+                            ->default(fn() => auth()->user()?->name)
+                            ->label('Kasir')
+                            ->disabled()
+                            ->columnSpan(2)
+                            ->dehydrated(false), // jangan simpan ke DB
                         TextInput::make('no_invoice')
                             ->label('No Invoice')
                             ->disabled()
+                            ->columnSpan(2)
                             ->dehydrated()
                             ->unique(ignoreRecord: true),
 
