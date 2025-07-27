@@ -32,8 +32,11 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
-            ->id('penjualan')
-            ->path('penjualan')
+            ->id('ht')
+            ->path('ht')
+            ->brandName('Penjualan-Barang')
+            // ->brandLogo(asset('img/ht.png'), height: 40)
+            ->favicon(asset('img/ht.png'))
             // ->routes(function () {
             //     Route::redirect('/', 'admin/login');
             // })

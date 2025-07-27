@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Route;
 //     return view('admin.login');
 // });
 
-Route::redirect('/', 'penjualan/login');
+Route::redirect('/', 'ht/login');
 
 // Route::get('/penjualan/{id}/invoice-penjualan', [InvoiceController::class, 'cetak'])->name('penjualan.invoice-penjualan');
 Route::get('/penjualan/{id}/invoice-penjualan', [InvoiceController::class, 'cetak'])->name('penjualan.invoice-penjualan');
