@@ -44,7 +44,6 @@ class PenjualanResource extends Resource
             ->schema([
                 Card::make()
                     ->schema([
-<<<<<<< HEAD
                         TextInput::make('user_id')
                             ->label('Kasir') // label tetap "Kasir"
                             ->default(fn() => auth()->user()?->name) // tampilkan nama
@@ -52,17 +51,7 @@ class PenjualanResource extends Resource
                             ->dehydrated(fn() => true) // kirim ID ke database, bukan nama
                             ->formatStateUsing(fn() => auth()->user()?->name) // tampilkan nama
                             ->afterStateHydrated(fn($component) => $component->state(auth()->id())), // simpan ID
-=======
-                        Hidden::make('user_id')
-                            ->default(fn() => auth()->id()),
-
-                        TextInput::make('kasir')
-                            ->default(fn() => auth()->user()?->name)
-                            ->label('Kasir')
-                            ->disabled()
-                            ->columnSpan(2)
-                            ->dehydrated(false), // jangan simpan ke DB
->>>>>>> 99209edce2c06a26186e08b6111dc0674c540002
+                            // ->afterStateHydrated(fn($component) => $component->state(auth()->id())), // simpan ID
                         TextInput::make('no_invoice')
                             ->label('No Invoice')
                             ->disabled()
