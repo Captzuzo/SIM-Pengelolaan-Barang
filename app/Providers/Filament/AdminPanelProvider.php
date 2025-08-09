@@ -8,6 +8,7 @@ use App\Filament\Pages\Laporan\LaporanLabaPage;
 use App\Filament\Pages\Laporan\LaporanTahunanPage;
 use App\Filament\Resources\BarangResource;
 use App\Filament\Resources\LaporanStokResource\Pages\LaporanStokPage;
+use App\Filament\Widgets\PenjualanChart;
 use App\Models\Barang;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -43,6 +44,7 @@ class AdminPanelProvider extends PanelProvider
             // ->id('admin')
             // ->path('admin')
             ->login()
+            // ->logout()
             ->colors([
                 'danger' => Color::Rose,
                 'gray' => Color::Gray,
@@ -73,6 +75,7 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Widgets\DashboardOverview::class,
                 // \App\Filament\Widgets\BarangStokMinimOverview::class,
                 \App\Filament\Widgets\PelangganHutangOverview::class,
+                PenjualanChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -87,6 +90,70 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->renderHook(
+                'panels::body.end',
+                fn() => <<<HTML
+        <!-- SweetAlert CDN -->
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            let formChanged = false;
+
+            // Handler untuk beforeunload browser
+            function beforeUnloadHandler(e) {
+                if (formChanged) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                }
+            }
+
+            // Tambah handler hanya sekali
+            window.addEventListener('beforeunload', beforeUnloadHandler);
+
+            // Deteksi perubahan di form
+            document.addEventListener('input', function (e) {
+                if (e.target.closest('form')) {
+                    formChanged = true;
+                }
+            });
+
+            // Reset flag saat form disubmit
+            document.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', () => {
+                    formChanged = false;
+                    window.removeEventListener('beforeunload', beforeUnloadHandler);
+                });
+            });
+
+            // Tangkap klik navigasi sidebar/menu
+            document.querySelectorAll('a[href]').forEach(link => {
+                link.addEventListener('click', function (e) {
+                    // Abaikan link internal (#) dan jika tidak ada perubahan
+                    if (!formChanged || link.href.includes('#')) return;
+
+                    e.preventDefault(); // Hentikan navigasi langsung
+
+                    // Tampilkan SweetAlert
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Perubahan belum disimpan',
+                        text: 'Apakah Anda yakin ingin meninggalkan halaman ini?',
+                        showCancelButton: true,
+                        confirmButtonColor: '#0d6efd',
+                        cancelButtonColor: '#dc3545',
+                        confirmButtonText: 'Ya, tinggalkan',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            formChanged = false;
+                            window.removeEventListener('beforeunload', beforeUnloadHandler);
+                            window.location.href = link.href;
+                        }
+                    });
+                });
+            });
+        </script>
+    HTML,
+            );
     }
 }

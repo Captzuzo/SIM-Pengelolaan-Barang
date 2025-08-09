@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+
 class DetailPenjualan extends Model
 {
     protected $fillable = [
@@ -38,9 +39,14 @@ class DetailPenjualan extends Model
         });
     }
 
+    // public function barang()
+    // {
+    //     return $this->belongsTo(Barang::class);
+    // }
+
     public function barang()
     {
-        return $this->belongsTo(Barang::class);
+        return $this->belongsTo(Barang::class, 'barang_id');
     }
 
     public function penjualan()

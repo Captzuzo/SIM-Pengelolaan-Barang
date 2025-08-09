@@ -1,58 +1,93 @@
 <x-filament::page>
-    <div class="space-y-6">
-        <x-filament::card class="bg-gray-900/60 backdrop-blur-md shadow-xl border border-gray-700 text-white">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-3xl font-extrabold tracking-tight flex items-center gap-2">
-                    📦 <span>Laporan Stok Barang</span>
-                </h3>
-                <span class="text-sm text-gray-400 italic">🕒 {{ now()->format('d M Y, H:i') }}</span>
-                <a 
-                    href="{{ route('laporan-stok.cetak') }}" 
-                    target="_blank" 
-                    class="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white font-medium rounded-md hover:bg-red-700 transition duration-200"
-                >
-                    <x-heroicon-o-printer class="w-5 h-5" />
-                    Cetak PDF
-                </a>
-            </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            <div class="overflow-x-auto rounded-xl border border-gray-700">
-                <table class="min-w-full text-sm text-white">
-                    <thead class="bg-gradient-to-r from-gray-800 to-gray-700 text-xs uppercase tracking-wider text-gray-300">
+        {{-- Total Nilai Stok --}}
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                    <x-filament::icon name="lucide-box-dollar" /> Total Nilai Stok
+                    
+                </h2>
+            </div>
+            <p class="text-3xl font-bold text-primary-600 dark:text-primary-500">
+                Rp {{ number_format($totalNilaiStok, 0, ',', '.') }}
+            </p>
+        </div>
+
+        {{-- Barang Terlaris --}}
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+                <x-filament::icon name="lucide-star" />Barang Terlaris
+            </h2>
+            <ul class="space-y-1 text-gray-700 dark:text-gray-200">
+                @forelse ($barangTerlaris as $barang)
+                    <li>🔹 {{ $barang['nama_barang'] }} – <strong>{{ $barang['qty'] }}</strong> terjual</li>
+                @empty
+                    <li class="italic text-sm text-gray-500">Tidak ada data.</li>
+                @endforelse
+            </ul>
+        </div>
+
+        {{-- Barang Hampir Habis --}}
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 col-span-1 md:col-span-2">
+            <h2 class="text-lg font-semibold text-red-600 dark:text-red-400 mb-4">
+                <x-filament::icon name="lucide-alert-circle" />Barang Hampir Habis
+            </h2>
+            <ul class="space-y-1">
+                @forelse ($barangHampirHabis as $barang)
+                    <li class="flex items-center justify-between bg-red-50 dark:bg-red-900/30 px-4 py-2 rounded-md">
+                        <span class="text-gray-800 dark:text-gray-200">
+                            {{ $barang['nama_barang'] }}
+                        </span>
+                        <span class="text-sm bg-red-600 text-white px-2 py-1 rounded-full">Stok: {{ $barang['stok'] }}</span>
+                    </li>
+                @empty
+                    <li class="italic text-sm text-gray-500">Semua stok aman.</li>
+                @endforelse
+            </ul>
+        </div>
+
+        {{-- Daftar Semua Barang --}}
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 col-span-1 md:col-span-2">
+            <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
+                <x-filament::icon name="lucide-archive" />Daftar Semua Barang
+            </h2>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-100 dark:bg-gray-700">
                         <tr>
-                            <th class="px-4 py-3 text-left">No</th>
-                            <th class="px-4 py-3 text-left">Nama Barang</th>
-                            <th class="px-4 py-3 text-left">Kategori</th>
-                            <th class="px-4 py-3 text-right">Stok</th>
-                            <th class="px-4 py-3 text-right">Harga Beli</th>
-                            <th class="px-4 py-3 text-right">Harga Jual</th>
-                            <th class="px-4 py-3 text-right">Total Nilai</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Nama</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Kategori</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Harga Beli</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Stok</th>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Subtotal</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-700">
-                        @foreach($barangs as $index => $barang)
-                            <tr class="hover:bg-gray-800/70 transition duration-200 ease-in-out">
-                                <td class="px-4 py-2">{{ $index + 1 }}</td>
-                                <td class="px-4 py-2 font-semibold text-blue-300">{{ $barang->nama_barang }}</td>
-                                <td class="px-4 py-2 text-gray-300">{{ $barang->kategori->nama_kategori ?? '-' }}</td>
-                                <td class="px-4 py-2 text-right">{{ $barang->stok }}</td>
-                                <td class="px-4 py-2 text-right text-green-400">Rp {{ number_format($barang->harga_beli, 0, ',', '.') }}</td>
-                                <td class="px-4 py-2 text-right text-yellow-400">Rp {{ number_format($barang->harga_jual, 0, ',', '.') }}</td>
-                                <td class="px-4 py-2 text-right text-white">Rp {{ number_format($barang->stok * $barang->harga_beli, 0, ',', '.') }}</td>
+                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                        @foreach ($barangs as $barang)
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/40">
+                                <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-200">
+                                    {{ $barang['nama_barang'] }}
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-200">
+                                    {{ $barang['kategori']['kode_kategori'] ?? '-' }}
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-200">
+                                    Rp {{ number_format($barang['harga_beli'], 0, ',', '.') }}
+                                </td>
+                                <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-200">
+                                    {{ $barang['stok'] }}
+                                </td>
+                                <td class="px-4 py-2 text-sm font-semibold text-primary-700 dark:text-primary-400">
+                                    Rp {{ number_format($barang['stok'] * $barang['harga_beli'], 0, ',', '.') }}
+                                </td>
                             </tr>
                         @endforeach
-
-                        {{-- <tr class="bg-gradient-to-r from-gray-800 to-gray-700 text-white font-bold">
-                            <td class="px-4 py-4 text-right" colspan="6">
-                                🧮 Jumlah Total Nilai Stok
-                            </td>
-                            <td class="px-4 py-4 text-right text-amber-400 text-lg">
-                                Rp {{ number_format($data['total_nilai_stok'], 0, ',', '.') }}
-                            </td>
-                        </tr> --}}
                     </tbody>
                 </table>
             </div>
-        </x-filament::card>
+        </div>
+
     </div>
 </x-filament::page>

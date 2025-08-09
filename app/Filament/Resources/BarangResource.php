@@ -97,6 +97,7 @@ class BarangResource extends Resource
                                 'SAR' => 'Riyal Saudi (﷼)',
                             ])
                             ->required()
+                            ->default('IDR')
                             ->live(), // agar perubahan langsung diterapkan
 
                         // Harga Beli

@@ -3,9 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use App\Models\Barang;
+use App\Models\Pelanggan;
 
 class Penjualan extends Model
 {
+    protected $keyType = 'string'; // UUID = string
+    public $incrementing = false;
+
     protected $fillable = [
         'no_invoice',
         'pelanggan_id',
@@ -20,8 +26,11 @@ class Penjualan extends Model
 
     public function barangs()
     {
-        return $this->belongsToMany(Barang::class, 'detail_penjualans');
+        return $this->belongsToMany(Barang::class, 'detail_penjualans')
+            ->withPivot('qty', 'harga_satuan', 'subtotal')
+            ->withTimestamps();
     }
+
 
     public function pelanggan()
     {
@@ -38,9 +47,15 @@ class Penjualan extends Model
         return $this->hasMany(DetailPenjualan::class);
     }
 
-    protected static function booted()
+    protected static function boot()
     {
+        parent::boot();
+
         static::creating(function ($model) {
+            if (empty($model->id)) {
+                $model->id = (string) Str::uuid();
+            }
+
             $total = (int) $model->total;
             $bayar = (int) $model->bayar;
 

@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('penjualans', function (Blueprint $table) {
-            $table->id();
+            $table->uuid('id')->primary();
             $table->string('no_invoice')->unique();
             $table->foreignId('pelanggan_id')->nullable()->constrained()->onDelete('set null');
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // kasir
             $table->integer('total');
-            $table->integer('diskon')->default(0);
+            // $table->integer('diskon')->default(0);
             $table->integer('bayar');
             $table->integer('sisa');
             $table->integer('kembalian');

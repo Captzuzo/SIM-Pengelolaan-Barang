@@ -2,67 +2,87 @@
 
 namespace App\Filament\Resources\LaporanStokResource\Pages;
 
-use App\Filament\Resources\LaporanStokResource;
 use App\Models\Barang;
+use App\Models\DetailPenjualan;
 use Filament\Pages\Page;
 
 class LaporanStokPage extends Page
 {
-    // protected static string $resource = LaporanStok::class;
-    protected static bool $shouldRegisterNavigation = true;
-    protected static ?string $navigationGroup = 'Laporan';
-    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+    // Page Configuration
     protected static ?string $title = 'Laporan Stok';
     protected static ?string $slug = 'laporan-stok';
+    protected static ?string $navigationGroup = 'Laporan';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
     protected static ?int $navigationSort = 20;
     protected static string $view = 'filament.pages.laporan.laporan-stok';
 
-    public $data = [];
+    // Page State
+    public array $barangs = [];
+    public float $totalNilaiStok = 0.0;
+    public array $barangTerlaris = [];
+    public array $barangHampirHabis = [];
 
-    // public function mount()
-    // {
-    //     $this->loadStok();
-    // }
-
+    /**
+     * Load data saat halaman dimount
+     */
     public function mount(): void
     {
-
-        $this->form->fill();
+        $this->loadLaporanStok();
     }
 
+    /**
+     * Ambil dan proses data untuk laporan stok
+     */
+    protected function loadLaporanStok(): void
+    {
+        // Data barang lengkap dengan kategori
+        $this->barangs = Barang::with('kategori')->get()->toArray();
+
+        // Total nilai stok (stok x harga beli)
+        $this->totalNilaiStok = collect($this->barangs)->sum(function ($barang) {
+            return $barang['stok'] * $barang['harga_beli'];
+        });
+
+        // Barang terlaris berdasarkan qty penjualan
+        $this->barangTerlaris = DetailPenjualan::with('barang')
+            ->selectRaw('barang_id, SUM(qty) as total_terjual')
+            ->groupBy('barang_id')
+            ->orderByDesc('total_terjual')
+            ->limit(5)
+            ->get()
+            ->map(fn($item) => [
+                'nama_barang' => $item->barang->nama_barang ?? '-',
+                'qty' => $item->total_terjual,
+            ])
+            ->toArray();
+
+        // Barang yang stoknya hampir habis
+        $this->barangHampirHabis = Barang::where('stok', '<=', 5)
+            ->orderBy('stok')
+            ->limit(5)
+            ->get(['nama_barang', 'stok'])
+            ->toArray();
+    }
+
+    /**
+     * Cek akses pengguna berdasarkan role/permission
+     */
     public static function canAccess(): bool
     {
         $user = auth()->user();
-
-        if (!$user) {
-            return false;
-        }
-
-        if ($user->hasRole('Admin')) {
-            return true;
-        }
-
-        if ($user->hasPermissionTo('View Laporan Stok')) {
-            return true;
-        }
-
-        return false;
+        return $user && ($user->hasRole('Admin') || $user->can('View Laporan Stok'));
     }
 
-    public function loadStok()
-    {
-        $barangs = Barang::with('kategori')->get();
-
-        $this->data['barangs'] = $barangs;
-        $this->data['total_nilai_stok'] = $barangs->sum(function ($barang) {
-            return $barang->stok * $barang->harga_beli;
-        });
-    }
+    /**
+     * Kirim data ke view
+     */
     public function getViewData(): array
     {
-        $barangs = Barang::with('kategori')->get();
-        $total_nilai_stok = $barangs->sum(fn($barang) => $barang->stok * $barang->harga_beli);
-
-        return compact('barangs', 'total_nilai_stok');
+        return [
+            'barangs' => $this->barangs,
+            'totalNilaiStok' => $this->totalNilaiStok,
+            'barangTerlaris' => $this->barangTerlaris,
+            'barangHampirHabis' => $this->barangHampirHabis,
+        ];
     }
 }

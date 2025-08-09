@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('detail_penjualans', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('penjualan_id')->constrained()->onDelete('cascade');
-            $table->foreignId('barang_id')->constrained()->onDelete('cascade');
+            $table->uuid('penjualan_id');
+            $table->foreign('penjualan_id')->references('id')->on('penjualans')->onDelete('cascade');
+            $table->foreignId('barang_id')->constrained('barangs')->onDelete('cascade');
             $table->integer('qty');
             $table->integer('harga_satuan');
             $table->integer('subtotal');

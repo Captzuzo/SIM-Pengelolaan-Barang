@@ -23,11 +23,13 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Str;
+// use Filament\Notifications\Notification;
 use Filament\Notifications\Notification;
 use Filament\Forms\Set;
 use Illuminate\Support\Facades\Auth;
 use Filament\Forms\Get;
 use Filament\Forms\Components\Hidden;
+use Filament\Tables\Actions\ViewAction;
 
 class PenjualanResource extends Resource
 {
@@ -45,13 +47,13 @@ class PenjualanResource extends Resource
                 Card::make()
                     ->schema([
                         TextInput::make('user_id')
-                            ->label('Kasir') // label tetap "Kasir"
-                            ->default(fn() => auth()->user()?->name) // tampilkan nama
+                            ->label('Kasir')
+                            ->default(auth()->id())
                             ->disabled()
-                            ->dehydrated(fn() => true) // kirim ID ke database, bukan nama
-                            ->formatStateUsing(fn() => auth()->user()?->name) // tampilkan nama
-                            ->afterStateHydrated(fn($component) => $component->state(auth()->id())), // simpan ID
-                            // ->afterStateHydrated(fn($component) => $component->state(auth()->id())), // simpan ID
+                            ->dehydrated()
+                            ->formatStateUsing(fn() => auth()->user()?->name)
+                            ->dehydrateStateUsing(fn() => auth()->id()),
+
                         TextInput::make('no_invoice')
                             ->label('No Invoice')
                             ->disabled()
@@ -90,7 +92,20 @@ class PenjualanResource extends Resource
                             ->schema([
                                 Select::make('barang_id')
                                     ->label('Barang')
-                                    ->relationship('barang', 'nama_barang')
+                                    ->options(function (callable $get) {
+                                        // Ambil semua barang
+                                        $allBarangs = \App\Models\Barang::all();
+
+                                        // Ambil semua barang_id yang sudah dipilih pada repeater
+                                        $selectedBarangIds = collect($get('../../details')) // naik 2 level dari barang_id
+                                            ->pluck('barang_id')
+                                            ->filter(); // buang null
+
+                                        // Filter barang yang belum dipilih
+                                        return $allBarangs
+                                            ->reject(fn($barang) => $selectedBarangIds->contains($barang->id))
+                                            ->pluck('nama_barang', 'id');
+                                    })
                                     ->searchable()
                                     ->required()
                                     ->reactive()
@@ -112,7 +127,11 @@ class PenjualanResource extends Resource
                                         $barang = \App\Models\Barang::find($get('barang_id'));
                                         if ($barang && $state > $barang->stok) {
                                             $set('qty', $barang->stok);
-                                            notification()->danger('Stok tidak mencukupi, stok tersedia: ' . $barang->stok);
+                                            Notification::make()
+                                                ->title('Stok tidak mencukupi')
+                                                ->body('Stok tersedia: ' . $barang->stok)
+                                                ->danger()
+                                                ->send();
                                         }
                                         $set('subtotal', (int)$state * (int)$get('harga_satuan'));
                                     }),
@@ -122,6 +141,8 @@ class PenjualanResource extends Resource
                                     ->numeric()
                                     ->required()
                                     ->reactive()
+                                    ->disabled()
+                                    ->dehydrated()
                                     ->afterStateUpdated(function ($state, callable $get, callable $set) {
                                         $set('subtotal', (int)$get('qty') * (int)$state);
                                     }),
@@ -200,7 +221,7 @@ class PenjualanResource extends Resource
                             ->numeric()
                             ->disabled()
                             ->columnSpan(2)
-                            ->formatStateUsing(fn($state) => 'Rp ' . number_format(max(0, $state), 0, ',', '.'))
+                            // ->formatStateUsing(fn($state) => 'Rp ' . number_format(max(0, $state), 0, ',', '.'))
                             // ->formatStateUsing(fn($state) => max(0, $state))
                             ->visible(fn(callable $get) => (int) $get('bayar') <= (int) $get('total'))
                             ->dehydrated(),
@@ -237,13 +258,11 @@ class PenjualanResource extends Resource
     {
         return $table
             ->columns([
-<<<<<<< HEAD
                 TextColumn::make('kasir.name')
                     ->label('Kasir')
                     ->searchable()
                     ->sortable(),
-=======
->>>>>>> 99209edce2c06a26186e08b6111dc0674c540002
+
                 Tables\Columns\TextColumn::make('no_invoice')
                     ->searchable()
                     ->sortable(),
@@ -259,7 +278,9 @@ class PenjualanResource extends Resource
                     ->money('IDR', true),
 
                 // Tables\Columns\TextColumn::make('sisa')
-                //     ->money('IDR', true),
+                //     ->label('Sisa')
+                //     ->money('IDR', true)
+                //     ->sortable(),
 
                 // Tables\Columns\TextColumn::make('kembalian')
                 //     ->money('IDR', true),
@@ -286,6 +307,13 @@ class PenjualanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+                // ->mutateRecordDataUsing(function (array $data) {
+                //     $data['sisa'] = 'Rp ' . number_format(max(0, $data['sisa'] ?? 0), 0, ',', '.');
+                //     $data['kembalian'] = 'Rp ' . number_format(max(0, $data['kembalian'] ?? 0), 0, ',', '.');
+                //     $data['total'] = 'Rp ' . number_format(max(0, $data['total'] ?? 0), 0, ',', '.');
+                //     $data['bayar'] = 'Rp ' . number_format(max(0, $data['bayar'] ?? 0), 0, ',', '.');
+                //     return $data;
+                // }),
                 Tables\Actions\Action::make('invoice-penjualan')
                     ->label('Cetak')
                     ->icon('heroicon-o-printer')

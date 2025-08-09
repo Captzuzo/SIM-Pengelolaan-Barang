@@ -6,13 +6,20 @@ use App\Http\Controllers\CetakLaporanLabaController;
 use App\Http\Controllers\CetakLaporanStokController;
 use App\Http\Controllers\CetakLaporanTahunanController;
 use App\Http\Controllers\InvoiceController;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 // Route::get('/', function () {
-//     return view('admin.login');
+//     return view('landingpage');
 // });
 
-Route::redirect('/', 'ht/login');
+Route::get('/', function () {
+    return redirect('/ht/login');
+});
+Route::post('/logout', function () {
+    Auth::logout();
+    session()->flash('logout_success', true);
+    return redirect()->route('filament.auth.login');
+})->name('logout');
 
 // Route::get('/penjualan/{id}/invoice-penjualan', [InvoiceController::class, 'cetak'])->name('penjualan.invoice-penjualan');
 Route::get('/penjualan/{id}/invoice-penjualan', [InvoiceController::class, 'cetak'])->name('penjualan.invoice-penjualan');

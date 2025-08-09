@@ -8,6 +8,10 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use App\Models\Penjualan;
 use App\Observers\PenjualanObserver;
+use Filament\Facades\Filament;
+use Illuminate\Support\Facades\Blade;
+use Filament\Navigation\UserMenuItem;
+use Filament\Support\Facades\FilamentView;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,5 +37,26 @@ class AppServiceProvider extends ServiceProvider
         // Gate::before(function ($user, $ability) {
         //     return $user->hasRole('Admin') ? true : null;
         // });
+
+        // \Filament\Support\Facades\FilamentView::registerRenderHook(
+        //     'head.end',
+        //     fn(): string => view('components.session-warning-script')->render(),
+        // );
+        // Filament::serving(function () {
+        //     \Filament\Support\Facades\FilamentView::registerRenderHook(
+        //         'body.end',
+        //         fn(): string => view('components.logout-confirmation')->render(),
+        //     );
+        // });
+        Filament::serving(function () {
+            Filament::registerUserMenuItems([
+                // Tidak daftarkan UserMenuItem::make()->label('Logout')...
+            ]);
+        });
+
+        FilamentView::registerRenderHook(
+            'filament::user-menu.before',
+            fn(): string => view('components.logout-modal')->render(),
+        );
     }
 }
