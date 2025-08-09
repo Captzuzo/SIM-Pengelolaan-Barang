@@ -47,17 +47,40 @@ class PelangganResource extends Resource
 
                         Select::make('province_id')
                             ->label('Provinsi')
+                            ->searchable()
                             ->required()
                             ->options(fn() => collect(
                                 json_decode(File::get(database_path('data/list_of_area/provinces.json')), true)
                             )->pluck('name', 'id')->toArray())
-                            ->searchable()
-                            ->reactive()
+                            ->getSearchResultsUsing(function (string $search): array {
+                                $json = File::get(database_path('data/list_of_area/provinces.json'));
+                                $data = collect(json_decode($json, true));
+
+                                // Tampilkan semua jika belum ada pencarian
+                                if (trim($search) === '') {
+                                    return $data->pluck('name', 'id')->toArray();
+                                }
+
+                                // Filter berdasarkan pencarian
+                                return $data
+                                    ->filter(fn($item) => str_contains(strtolower($item['name']), strtolower($search)))
+                                    ->pluck('name', 'id')
+                                    ->toArray();
+                            })
+                            ->getOptionLabelUsing(function ($value) {
+                                $json = File::get(database_path('data/list_of_area/provinces.json'));
+                                $data = collect(json_decode($json, true));
+
+                                return $data->firstWhere('id', $value)['name'] ?? null;
+                            })
+                            // ->reactive()
                             ->afterStateUpdated(fn($state, callable $set) => $set('regency_id', null)),
 
                         Select::make('regency_id')
                             ->label('Kabupaten/Kota')
                             ->required()
+                            ->searchable()
+                            // ->reactive()
                             ->options(function (callable $get) {
                                 $provinceId = $get('province_id');
                                 return collect(
@@ -67,15 +90,45 @@ class PelangganResource extends Resource
                                     ->pluck('name', 'id')
                                     ->toArray();
                             })
-                            ->searchable()
-                            ->reactive()
+                            ->getSearchResultsUsing(function (string $search, callable $get): array {
+                                $provinceId = $get('province_id');
+
+                                if (!$provinceId) {
+                                    return [];
+                                }
+
+                                $json = File::get(database_path('data/list_of_area/regencies.json'));
+                                $data = collect(json_decode($json, true))
+                                    ->where('province_id', $provinceId);
+
+                                if (trim($search) !== '') {
+                                    $data = $data->filter(
+                                        fn($item) => str_contains(strtolower($item['name']), strtolower($search))
+                                    );
+                                }
+
+                                return $data->pluck('name', 'id')->toArray();
+                            })
+                            ->getOptionLabelUsing(function ($value) {
+                                $json = File::get(database_path('data/list_of_area/regencies.json'));
+                                $data = collect(json_decode($json, true));
+
+                                return $data->firstWhere('id', $value)['name'] ?? null;
+                            })
                             ->afterStateUpdated(fn($state, callable $set) => $set('district_id', null)),
 
                         Select::make('district_id')
                             ->label('Kecamatan')
                             ->required()
+                            ->searchable()
+                            // ->reactive()
                             ->options(function (callable $get) {
                                 $regencyId = $get('regency_id');
+
+                                if (!$regencyId) {
+                                    return [];
+                                }
+
                                 return collect(
                                     json_decode(File::get(database_path('data/list_of_area/districts.json')), true)
                                 )
@@ -83,15 +136,43 @@ class PelangganResource extends Resource
                                     ->pluck('name', 'id')
                                     ->toArray();
                             })
-                            ->searchable()
-                            ->reactive()
+                            ->getSearchResultsUsing(function (string $search, callable $get): array {
+                                $regencyId = $get('regency_id');
+
+                                if (!$regencyId) {
+                                    return [];
+                                }
+
+                                $data = collect(json_decode(File::get(database_path('data/list_of_area/districts.json')), true))
+                                    ->where('regency_id', $regencyId);
+
+                                if (trim($search) !== '') {
+                                    $data = $data->filter(
+                                        fn($item) => str_contains(strtolower($item['name']), strtolower($search))
+                                    );
+                                }
+
+                                return $data->pluck('name', 'id')->toArray();
+                            })
+                            ->getOptionLabelUsing(function ($value) {
+                                $data = collect(json_decode(File::get(database_path('data/list_of_area/districts.json')), true));
+                                return $data->firstWhere('id', $value)['name'] ?? null;
+                            })
                             ->afterStateUpdated(fn($state, callable $set) => $set('village_id', null)),
+
 
                         Select::make('village_id')
                             ->label('Desa/Kelurahan')
                             ->required()
+                            ->searchable()
+                            // ->reactive()
                             ->options(function (callable $get) {
                                 $districtId = $get('district_id');
+
+                                if (!$districtId) {
+                                    return [];
+                                }
+
                                 return collect(
                                     json_decode(File::get(database_path('data/list_of_area/villages.json')), true)
                                 )
@@ -99,10 +180,29 @@ class PelangganResource extends Resource
                                     ->pluck('name', 'id')
                                     ->toArray();
                             })
-                            ->searchable(),
+                            ->getSearchResultsUsing(function (string $search, callable $get): array {
+                                $districtId = $get('district_id');
 
-                        Forms\Components\Textarea::make('alamat_lengkap')
-                            ->required(),
+                                if (!$districtId) {
+                                    return [];
+                                }
+
+                                $data = collect(json_decode(File::get(database_path('data/list_of_area/villages.json')), true))
+                                    ->where('district_id', $districtId);
+
+                                if (trim($search) !== '') {
+                                    $data = $data->filter(
+                                        fn($item) => str_contains(strtolower($item['name']), strtolower($search))
+                                    );
+                                }
+
+                                return $data->pluck('name', 'id')->toArray();
+                            })
+                            ->getOptionLabelUsing(function ($value) {
+                                $data = collect(json_decode(File::get(database_path('data/list_of_area/villages.json')), true));
+                                return $data->firstWhere('id', $value)['name'] ?? null;
+                            }),
+
                     ])
             ]);
     }
