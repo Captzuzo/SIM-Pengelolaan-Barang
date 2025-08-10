@@ -35,7 +35,11 @@ class BarangJualResource extends Resource
                     ->schema([
                         Select::make('barang_id')
                             ->label('Barang')
-                            ->options(Barang::all()->pluck('nama_barang', 'id'))
+                            ->options(function () {
+                                $sudahDipakai = \App\Models\BarangJual::pluck('barang_id'); // barang yang sudah punya harga jual
+                                return \App\Models\Barang::whereNotIn('id', $sudahDipakai)
+                                    ->pluck('nama_barang', 'id');
+                            })
                             ->required(),
 
                         TextInput::make('harga_jual')
