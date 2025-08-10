@@ -317,9 +317,55 @@ class BarangResource extends Resource
             ->filters([
                 //
             ])
+            // ->headerActions([
+            //     Action::make('refresh_data')
+            //         ->label('Refresh Stok')
+            //         ->icon('heroicon-o-arrow-path')
+            //         ->action(function () {
+            //             DB::transaction(function () {
+            //                 $barangs = \App\Models\Barang::all();
+
+            //                 foreach ($barangs as $barang) {
+            //                     // Hitung stok masuk dari semua pembelian
+            //                     $stokMasuk = $barang->detailBarangBeli()->sum('stok');
+
+            //                     // Hitung stok keluar dari semua penjualan
+            //                     $stokKeluar = $barang->detailPenjualan()->sum('qty');
+
+            //                     // Stok akhir = masuk - keluar
+            //                     $barang->stok = max(0, $stokMasuk - $stokKeluar);
+
+            //                     // Update harga beli dari pembelian terbaru
+            //                     $hargaBeliTerakhir = $barang->detailBarangBeli()
+            //                         ->latest()
+            //                         ->value('harga_satuan');
+            //                     if ($hargaBeliTerakhir !== null) {
+            //                         $barang->harga_beli = $hargaBeliTerakhir;
+            //                     }
+
+            //                     // Update harga jual dari penjualan terbaru
+            //                     $hargaJualTerakhir = $barang->detailPenjualan()
+            //                         ->latest()
+            //                         ->value('harga_satuan');
+            //                     if ($hargaJualTerakhir !== null) {
+            //                         $barang->harga_jual = $hargaJualTerakhir;
+            //                     }
+
+            //                     $barang->save();
+            //                 }
+            //             });
+
+            //             Notification::make()
+            //                 ->title('Stok berhasil dihitung ulang dari riwayat!')
+            //                 ->success()
+            //                 ->send();
+            //         })
+            //         ->requiresConfirmation()
+            //         ->color('success'),
+            // ])
             ->headerActions([
                 Action::make('refresh_data')
-                    ->label('Refresh Stok')
+                    ->label('Refresh Stok & Harga')
                     ->icon('heroicon-o-arrow-path')
                     ->action(function () {
                         DB::transaction(function () {
@@ -335,18 +381,18 @@ class BarangResource extends Resource
                                 // Stok akhir = masuk - keluar
                                 $barang->stok = max(0, $stokMasuk - $stokKeluar);
 
-                                // Update harga beli dari pembelian terbaru
+                                // Ambil harga beli terakhir dari pembelian terbaru
                                 $hargaBeliTerakhir = $barang->detailBarangBeli()
-                                    ->latest()
+                                    ->latest('created_at')
                                     ->value('harga_satuan');
                                 if ($hargaBeliTerakhir !== null) {
                                     $barang->harga_beli = $hargaBeliTerakhir;
                                 }
 
-                                // Update harga jual dari penjualan terbaru
-                                $hargaJualTerakhir = $barang->detailPenjualan()
-                                    ->latest()
-                                    ->value('harga_satuan');
+                                // Ambil harga jual terakhir dari penjualan terbaru
+                                $hargaJualTerakhir = $barang->barangJual()
+                                    ->latest('created_at')
+                                    ->value('harga_jual');
                                 if ($hargaJualTerakhir !== null) {
                                     $barang->harga_jual = $hargaJualTerakhir;
                                 }
@@ -356,7 +402,7 @@ class BarangResource extends Resource
                         });
 
                         Notification::make()
-                            ->title('Stok berhasil dihitung ulang dari riwayat!')
+                            ->title('Stok & harga berhasil diperbarui dari riwayat!')
                             ->success()
                             ->send();
                     })

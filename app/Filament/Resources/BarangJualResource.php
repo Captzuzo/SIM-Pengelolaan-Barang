@@ -35,10 +35,26 @@ class BarangJualResource extends Resource
                     ->schema([
                         Select::make('barang_id')
                             ->label('Barang')
-                            ->options(function () {
-                                $sudahDipakai = \App\Models\BarangJual::pluck('barang_id'); // barang yang sudah punya harga jual
-                                return \App\Models\Barang::whereNotIn('id', $sudahDipakai)
-                                    ->pluck('nama_barang', 'id');
+                            ->options(function ($get, $record) {
+                                // Barang_id yang sedang diedit (kalau mode edit)
+                                $currentBarangId = $record?->barang_id;
+
+                                // Ambil semua barang yang belum ada di tabel barang_jual
+                                $query = \App\Models\Barang::query()
+                                    ->whereNotIn('id', function ($q) use ($currentBarangId) {
+                                        $q->select('barang_id')->from('barang_juals');
+                                        if ($currentBarangId) {
+                                            // Kecualikan barang yang sedang diedit
+                                            $q->where('barang_id', '!=', $currentBarangId);
+                                        }
+                                    });
+
+                                // Kalau mode edit, tambahkan barang yang sedang dipakai
+                                if ($currentBarangId) {
+                                    $query->orWhere('id', $currentBarangId);
+                                }
+
+                                return $query->pluck('nama_barang', 'id');
                             })
                             ->required(),
 
