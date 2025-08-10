@@ -92,6 +92,7 @@ class PenjualanResource extends Resource
                             ->schema([
                                 Select::make('barang_id')
                                     ->label('Barang')
+                                    ->relationship('barang', 'nama_barang')
                                     ->options(function (callable $get) {
                                         // Ambil semua barang
                                         $allBarangs = \App\Models\Barang::all();
@@ -111,10 +112,15 @@ class PenjualanResource extends Resource
                                     ->reactive()
                                     ->preload()
                                     ->afterStateUpdated(function ($state, callable $set) {
-                                        if ($barang = \App\Models\Barang::find($state)) {
-                                            $set('harga_satuan', $barang->harga_jual);
+                                        $barang = \App\Models\Barang::with('barangJual')->find($state);
+                                        if ($barang && $barang->barangJual) {
+                                            $set('harga_satuan', $barang->barangJual->harga_jual);
                                             $set('qty', 1);
-                                            $set('subtotal', $barang->harga_jual);
+                                            $set('subtotal', $barang->barangJual->harga_jual);
+                                        } else {
+                                            $set('harga_satuan', 0);
+                                            $set('qty', 1);
+                                            $set('subtotal', 0);
                                         }
                                     }),
 

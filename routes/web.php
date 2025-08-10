@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BarangBeliController;
 use App\Http\Controllers\CetakLaporanBulananController;
 use App\Http\Controllers\CetakLaporanHarianController;
 use App\Http\Controllers\CetakLaporanLabaController;
@@ -23,6 +24,9 @@ Route::post('/logout', function () {
 
 // Route::get('/penjualan/{id}/invoice-penjualan', [InvoiceController::class, 'cetak'])->name('penjualan.invoice-penjualan');
 Route::get('/penjualan/{id}/invoice-penjualan', [InvoiceController::class, 'cetak'])->name('penjualan.invoice-penjualan');
+
+Route::get('/barang-beli/{id}/invoice', [BarangBeliController::class, 'cetak'])
+    ->name('barangBeli.barang-beli');
 
 Route::get('/laporan-laba/cetak', [CetakLaporanLabaController::class, 'cetak'])->name('laporan-laba.cetak');
 Route::get('/laporan-stok/cetak', [CetakLaporanStokController::class, 'cetak'])->name('laporan-stok.cetak');

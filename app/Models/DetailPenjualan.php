@@ -3,10 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Support\Str;
 
 
 class DetailPenjualan extends Model
 {
+    use HasUuids;
+
+    protected $keyType = 'string'; // UUID = string
+    public $incrementing = false;
+
     protected $fillable = [
         'penjualan_id',
         'barang_id',

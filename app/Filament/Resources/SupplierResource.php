@@ -2,35 +2,29 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\PelangganResource\Pages;
-use App\Filament\Resources\PelangganResource\RelationManagers;
-use App\Models\Barang;
-use App\Models\Pelanggan;
-use App\Models\Penjualan;
+use App\Filament\Resources\SupplierResource\Pages;
+use App\Filament\Resources\SupplierResource\RelationManagers;
+use App\Models\Supplier;
 use Filament\Forms;
 use Filament\Forms\Components\Card;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+
 use Illuminate\Support\Facades\File;
 
-class PelangganResource extends Resource
+class SupplierResource extends Resource
 {
-    protected static ?string $model = Pelanggan::class;
+    protected static ?string $model = Supplier::class;
     protected static ?string $navigationGroup = 'Master';
-    protected static ?string $navigationLabel = 'Pelanggan';
-    protected static ?string $slug = 'pelanggan';
-    protected static ?int $navigationSort = 2;
+    protected static ?string $navigationLabel = 'Supplier';
+    protected static ?string $slug = 'supplier';
+    protected static ?int $navigationSort = 3;
     protected static ?string $navigationIcon = 'heroicon-o-User';
 
     public static function form(Form $form): Form
@@ -219,7 +213,6 @@ class PelangganResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->query(Pelanggan::query())
             ->columns([
                 Tables\Columns\TextColumn::make('nama')
                     ->searchable(),
@@ -270,21 +263,14 @@ class PelangganResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\EditAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
-        // ->query(
-        //     Pelanggan::with(['province_id', 'regency_id', 'district_id', 'village_id'])
-        // )
-        // ->modifyQueryUsing(function (Builder $query) {
-        //     // ← Di sinilah kamu bisa menggunakan Eloquent\Builder
-        //     $query->with(['province_id', 'regency_id', 'district_id', 'village_id']);
-        // });
     }
 
     public static function getRelations(): array
@@ -297,9 +283,9 @@ class PelangganResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPelanggans::route('/'),
-            'create' => Pages\CreatePelanggan::route('/create'),
-            'edit' => Pages\EditPelanggan::route('/{record}/edit'),
+            'index' => Pages\ListSuppliers::route('/'),
+            'create' => Pages\CreateSupplier::route('/create'),
+            'edit' => Pages\EditSupplier::route('/{record}/edit'),
         ];
     }
 }

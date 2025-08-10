@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\BarangResource\Pages;
 use App\Filament\Resources\BarangResource\RelationManagers;
 use App\Models\Barang;
+use App\Models\BarangBeli;
 use App\Models\Kategori;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
@@ -17,16 +18,21 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Support\RawJs;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Tables\Actions\Action;
+use Illuminate\Support\Facades\DB;
+use Filament\Notifications;
+use Filament\Notifications\Notification;
 
 class BarangResource extends Resource
 {
     protected static ?string $model = Barang::class;
-    protected static ?string $navigationGroup = 'Master';
+    protected static ?string $navigationGroup = 'Manajemen Barang';
     protected static ?string $slug = 'barang';
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 3;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -68,8 +74,9 @@ class BarangResource extends Resource
                             }),
 
                         Forms\Components\TextInput::make('nama_barang')
-                            ->required()
-                            ->maxLength(255),
+                            ->label('Nama Barang')
+                            ->required(),
+
 
                         // Pilihan mata uang
                         Select::make('mata_uang')
@@ -163,7 +170,9 @@ class BarangResource extends Resource
                         Forms\Components\TextInput::make('stok')
                             ->required()
                             ->numeric()
-                            ->maxLength(255),
+                            ->default(0)
+                            ->minValue(0)
+                            ->readOnly(),
 
                         Select::make('satuan')
                             ->label('Satuan')
@@ -206,9 +215,9 @@ class BarangResource extends Resource
 
                 Tables\Columns\TextColumn::make('nama_barang')
                     ->searchable(),
-
                 Tables\Columns\TextColumn::make('harga_beli')
                     ->label('Harga Beli')
+                    ->searchable()
                     ->formatStateUsing(function ($state, $record) {
                         return match ($record->mata_uang) {
                             'USD' => '$' . number_format($state, 2),
@@ -233,9 +242,9 @@ class BarangResource extends Resource
                             default => 'Rp ' . number_format($state, 0, ',', '.'),
                         };
                     }),
-
                 Tables\Columns\TextColumn::make('harga_jual')
                     ->label('Harga Jual')
+                    ->searchable()
                     ->formatStateUsing(function ($state, $record) {
                         return match ($record->mata_uang) {
                             'USD' => '$' . number_format($state, 2),
@@ -261,14 +270,81 @@ class BarangResource extends Resource
                         };
                     }),
 
-                Tables\Columns\TextColumn::make('stok')
-                    ->searchable(),
 
-                Tables\Columns\TextColumn::make('satuan')
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('total_stok')
+                    ->label('Total Stok')
+                    ->getStateUsing(function ($record) {
+                        $total = $record->detailBarangBeli()->sum('stok');
+                        return number_format((float) $total, 0, ',', '.');
+                    })
+                    ->sortable(),
+
+                // Tables\Columns\TextColumn::make('harga_satuan')
+                //     ->label('Harga Satuan')
+                //     ->formatStateUsing(function ($state, $record) {
+                //         $value = is_numeric($state) ? $state : 0;
+                //         return match ($record->mata_uang) {
+                //             'USD' => '$' . number_format($value, 2),
+                //             'EUR' => '€' . number_format($value, 2),
+                //             'JPY' => '¥' . number_format($value, 0),
+                //             'GBP' => '£' . number_format($value, 2),
+                //             'AUD' => 'A$' . number_format($value, 2),
+                //             'CAD' => 'C$' . number_format($value, 2),
+                //             'CHF' => 'CHF ' . number_format($value, 2),
+                //             'CNY' => '¥' . number_format($value, 2),
+                //             'SGD' => 'S$' . number_format($value, 2),
+                //             'HKD' => 'HK$' . number_format($value, 2),
+                //             'NZD' => 'NZ$' . number_format($value, 2),
+                //             'KRW' => '₩' . number_format($value, 0),
+                //             'INR' => '₹' . number_format($value, 2),
+                //             'THB' => '฿' . number_format($value, 2),
+                //             'MYR' => 'RM' . number_format($value, 2),
+                //             'PHP' => '₱' . number_format($value, 2),
+                //             'VND' => '₫' . number_format($value, 0),
+                //             'AED' => 'د.إ' . number_format($value, 2),
+                //             'SAR' => '﷼' . number_format($value, 2),
+                //             default => 'Rp ' . number_format($value, 0, ',', '.'),
+                // //         };
+                //     }),
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                Action::make('refresh_data')
+                    ->label('Refresh Data')
+                    ->icon('heroicon-o-arrow-path')
+                    ->action(function () {
+                        DB::transaction(function () {
+                            $barangs = \App\Models\Barang::all();
+                            foreach ($barangs as $barang) {
+                                // Update stok dari BarangBeli
+                                $stok = $barang->detailBarangBeli()->sum('stok');
+                                $barang->stok = $stok;
+
+                                // Update harga beli dari transaksi terakhir di BarangBeli
+                                $hargaBeliTerakhir = $barang->detailBarangBeli()->latest()->value('harga_satuan');
+                                if ($hargaBeliTerakhir !== null) {
+                                    $barang->harga_beli = $hargaBeliTerakhir;
+                                }
+
+                                // Update harga jual dari transaksi terakhir di BarangJual
+                                $hargaJualTerakhir = $barang->barangJual()->latest()->value('harga_jual');
+                                if ($hargaJualTerakhir !== null) {
+                                    $barang->harga_jual = $hargaJualTerakhir;
+                                }
+
+                                $barang->save();
+                            }
+                        });
+
+                        Notification::make()
+                            ->title('Data berhasil diperbarui!')
+                            ->success()
+                            ->send();
+                    })
+                    ->requiresConfirmation()
+                    ->color('success'),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

@@ -52,9 +52,14 @@ class Penjualan extends Model
         parent::boot();
 
         static::creating(function ($model) {
+            // if (empty($model->id)) {
+            //     $model->id = (string) Str::uuid();
+            // }
+
             if (empty($model->id)) {
-                $model->id = (string) Str::uuid();
+                $model->id = (string) \Illuminate\Support\Str::uuid();
             }
+
 
             $total = (int) $model->total;
             $bayar = (int) $model->bayar;
