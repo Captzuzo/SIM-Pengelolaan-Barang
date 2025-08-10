@@ -11,7 +11,6 @@ use Illuminate\Support\Str;
 class BarangBeli extends Model
 {
     use HasFactory, HasUuids;
-    use HasUuids;
 
     protected $keyType = 'string';
     public $incrementing = false;
@@ -31,6 +30,11 @@ class BarangBeli extends Model
         //     if (empty($model->id)) {
         //         $model->id = (string) \Illuminate\Support\Str::uuid();
         //     }
+        // });
+        // static::created(function ($detail) {
+        //     $barang = $detail->barang;
+        //     $barang->stok += $detail->stok;
+        //     $barang->save();
         // });
 
         static::creating(function ($model) {

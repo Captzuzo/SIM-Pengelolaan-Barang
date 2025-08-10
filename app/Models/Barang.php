@@ -64,16 +64,26 @@ class Barang extends Model
     {
         return $this->belongsTo(BarangBeli::class, 'barang_beli_id');
     }
-
     public function detailBarangBeli()
     {
-        return $this->hasMany(DetailBarangBeli::class);
+        return $this->hasMany(DetailBarangBeli::class, 'barang_id');
     }
+
+    public function detailPenjualan()
+    {
+        return $this->hasMany(DetailPenjualan::class, 'barang_id');
+    }
+
+    // public function detailBarangBeli()
+    // {
+    //     return $this->hasMany(DetailBarangBeli::class, 'barang_id', 'id');
+    // }
 
     public function barangJual()
     {
         return $this->hasOne(BarangJual::class);
     }
+
 
     // public function detailBarangBeli()
     // {

@@ -271,12 +271,19 @@ class BarangResource extends Resource
                     }),
 
 
-                Tables\Columns\TextColumn::make('total_stok')
-                    ->label('Total Stok')
-                    ->getStateUsing(function ($record) {
-                        $total = $record->detailBarangBeli()->sum('stok');
-                        return number_format((float) $total, 0, ',', '.');
-                    })
+                // Tables\Columns\TextColumn::make('total_stok')
+                //     ->label('Total Stok')
+                //     ->getStateUsing(function ($record) {
+                //         $total = $record->detailBarangBeli()->sum('stok');
+                //         return number_format((float) $total, 0, ',', '.');
+                //     })
+                //     ->sortable(),
+                Tables\Columns\TextColumn::make('stok')
+                    ->label('Stok')
+                    // ->getStateUsing(function ($record) {
+                    //     $total = $record->detailBarangBeli()->sum('stok');
+                    //     return number_format((float) $total, 0, ',', '.');
+                    // })
                     ->sortable(),
 
                 // Tables\Columns\TextColumn::make('harga_satuan')
@@ -312,24 +319,34 @@ class BarangResource extends Resource
             ])
             ->headerActions([
                 Action::make('refresh_data')
-                    ->label('Refresh Data')
+                    ->label('Refresh Stok')
                     ->icon('heroicon-o-arrow-path')
                     ->action(function () {
                         DB::transaction(function () {
                             $barangs = \App\Models\Barang::all();
-                            foreach ($barangs as $barang) {
-                                // Update stok dari BarangBeli
-                                $stok = $barang->detailBarangBeli()->sum('stok');
-                                $barang->stok = $stok;
 
-                                // Update harga beli dari transaksi terakhir di BarangBeli
-                                $hargaBeliTerakhir = $barang->detailBarangBeli()->latest()->value('harga_satuan');
+                            foreach ($barangs as $barang) {
+                                // Hitung stok masuk dari semua pembelian
+                                $stokMasuk = $barang->detailBarangBeli()->sum('stok');
+
+                                // Hitung stok keluar dari semua penjualan
+                                $stokKeluar = $barang->detailPenjualan()->sum('qty');
+
+                                // Stok akhir = masuk - keluar
+                                $barang->stok = max(0, $stokMasuk - $stokKeluar);
+
+                                // Update harga beli dari pembelian terbaru
+                                $hargaBeliTerakhir = $barang->detailBarangBeli()
+                                    ->latest()
+                                    ->value('harga_satuan');
                                 if ($hargaBeliTerakhir !== null) {
                                     $barang->harga_beli = $hargaBeliTerakhir;
                                 }
 
-                                // Update harga jual dari transaksi terakhir di BarangJual
-                                $hargaJualTerakhir = $barang->barangJual()->latest()->value('harga_jual');
+                                // Update harga jual dari penjualan terbaru
+                                $hargaJualTerakhir = $barang->detailPenjualan()
+                                    ->latest()
+                                    ->value('harga_satuan');
                                 if ($hargaJualTerakhir !== null) {
                                     $barang->harga_jual = $hargaJualTerakhir;
                                 }
@@ -339,13 +356,14 @@ class BarangResource extends Resource
                         });
 
                         Notification::make()
-                            ->title('Data berhasil diperbarui!')
+                            ->title('Stok berhasil dihitung ulang dari riwayat!')
                             ->success()
                             ->send();
                     })
                     ->requiresConfirmation()
                     ->color('success'),
             ])
+
             ->actions([
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),

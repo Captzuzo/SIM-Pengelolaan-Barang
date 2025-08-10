@@ -18,23 +18,28 @@ class DetailBarangBeli extends Model
         'harga_satuan'
     ];
 
-    public function barangBeli()
+    public function detailBarangBeli()
     {
-        return $this->belongsTo(BarangBeli::class);
+        return $this->hasMany(DetailBarangBeli::class, 'barang_id');
+    }
+
+    public function detailPenjualan()
+    {
+        return $this->hasMany(DetailPenjualan::class, 'barang_id');
     }
 
     public function barang()
     {
-        return $this->belongsTo(Barang::class);
+        return $this->belongsTo(Barang::class, 'barang_id');
     }
 
     // Update stok barang otomatis setelah detail pembelian dibuat
     protected static function booted()
     {
-        static::created(function ($detail) {
-            $barang = $detail->barang;
-            $barang->stok += $detail->stok;
-            $barang->save();
-        });
+        // static::created(function ($detail) {
+        //     $barang = $detail->barang;
+        //     $barang->stok += $detail->stok;
+        //     $barang->save();
+        // });
     }
 }

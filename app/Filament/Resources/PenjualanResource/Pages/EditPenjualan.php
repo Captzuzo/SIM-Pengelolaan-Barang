@@ -31,6 +31,17 @@ class EditPenjualan extends EditRecord
     /**
      * Kembalikan stok barang saat penjualan dihapus
      */
+
+    protected function afterCreate(): void
+    {
+        foreach ($this->record->details as $detail) {
+            $barang = \App\Models\Barang::find($detail->barang_id);
+            if ($barang) {
+                $barang->stok -= $detail->qty;
+                $barang->save();
+            }
+        }
+    }
     protected function beforeDelete(): void
     {
         foreach ($this->record->details as $detail) {

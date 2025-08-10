@@ -313,13 +313,6 @@ class PenjualanResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                // ->mutateRecordDataUsing(function (array $data) {
-                //     $data['sisa'] = 'Rp ' . number_format(max(0, $data['sisa'] ?? 0), 0, ',', '.');
-                //     $data['kembalian'] = 'Rp ' . number_format(max(0, $data['kembalian'] ?? 0), 0, ',', '.');
-                //     $data['total'] = 'Rp ' . number_format(max(0, $data['total'] ?? 0), 0, ',', '.');
-                //     $data['bayar'] = 'Rp ' . number_format(max(0, $data['bayar'] ?? 0), 0, ',', '.');
-                //     return $data;
-                // }),
                 Tables\Actions\Action::make('invoice-penjualan')
                     ->label('Cetak')
                     ->icon('heroicon-o-printer')

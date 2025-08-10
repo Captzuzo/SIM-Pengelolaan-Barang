@@ -17,4 +17,15 @@ class CreatePenjualan extends CreateRecord
     {
         return 'Penjualan Berhasil Dibuat';
     }
+
+    protected function afterCreate(): void
+    {
+        foreach ($this->record->details as $detail) {
+            $barang = \App\Models\Barang::find($detail->barang_id);
+            if ($barang) {
+                $barang->stok -= $detail->qty;
+                $barang->save();
+            }
+        }
+    }
 }
