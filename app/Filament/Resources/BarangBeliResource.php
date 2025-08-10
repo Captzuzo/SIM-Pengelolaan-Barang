@@ -69,12 +69,26 @@ class BarangBeliResource extends Resource
                                 }
                             }),
                         Repeater::make('detailBarangBeli')
-                            ->relationship()
+                            ->relationship('detailBarangBeli')
                             ->schema([
                                 Select::make('barang_id')
                                     ->label('Barang')
                                     ->relationship('barang', 'nama_barang')
-                                    ->options(Barang::all()->pluck('nama_barang', 'id'))
+                                    // ->options(Barang::all()->pluck('nama_barang', 'id'))
+                                    ->options(function (callable $get) {
+                                        // Ambil semua barang
+                                        $allBarangs = \App\Models\Barang::all();
+
+                                        // Ambil semua barang_id yang sudah dipilih pada repeater
+                                        $selectedBarangIds = collect($get('../../detailBarangBeli')) // naik 2 level dari barang_id
+                                            ->pluck('barang_id')
+                                            ->filter(); // buang null
+
+                                        // Filter barang yang belum dipilih
+                                        return $allBarangs
+                                            ->reject(fn($barang) => $selectedBarangIds->contains($barang->id))
+                                            ->pluck('nama_barang', 'id');
+                                    })
                                     ->required()
                                     ->searchable(),
                                 TextInput::make('stok')
