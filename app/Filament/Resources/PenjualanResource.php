@@ -86,9 +86,9 @@ class PenjualanResource extends Resource
                             ->columnSpan(2)
                             ->required(),
 
-                        Repeater::make('details')
+                        Repeater::make('detail')
                             ->label('Detail Penjualan')
-                            ->relationship('details')
+                            ->relationship('detail')
                             ->schema([
                                 Select::make('barang_id')
                                     ->label('Barang')
@@ -98,7 +98,7 @@ class PenjualanResource extends Resource
                                         $allBarangs = \App\Models\Barang::all();
 
                                         // Ambil semua barang_id yang sudah dipilih pada repeater
-                                        $selectedBarangIds = collect($get('../../details')) // naik 2 level dari barang_id
+                                        $selectedBarangIds = collect($get('../../detail')) // naik 2 level dari barang_id
                                             ->pluck('barang_id')
                                             ->filter(); // buang null
 
@@ -164,7 +164,7 @@ class PenjualanResource extends Resource
                             ->columnSpan(2)
                             ->reactive()
                             ->afterStateUpdated(function (callable $get, callable $set) {
-                                $details = collect($get('details'));
+                                $details = collect($get('detail'));
                                 $total = $details->sum('subtotal');
                                 $set('total', $total);
                             })
@@ -178,7 +178,7 @@ class PenjualanResource extends Resource
                             ->disabled()
                             ->dehydrated()
                             ->placeholder(function (Set $set, Get $get) {
-                                $details = collect($get('details'))
+                                $details = collect($get('detail'))
                                     ->pluck('subtotal')->sum();
                                 if ($details == null) {
                                     $set('total', 0);

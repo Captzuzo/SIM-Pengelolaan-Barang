@@ -2,6 +2,18 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
         {{-- Total Nilai Stok --}}
+        {{-- <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">
+                    <x-filament::icon name="lucide-box-dollar" /> Total Stok
+                    
+                </h2>
+            </div>
+            <p class="text-3xl font-bold text-primary-600 dark:text-primary-500">
+                Rp {{ number_format($stok, 0, ',', '.') }}
+            </p>
+        </div> --}}
+
         <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100">

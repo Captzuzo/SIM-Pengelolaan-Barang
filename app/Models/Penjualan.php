@@ -42,7 +42,7 @@ class Penjualan extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function details()
+    public function detail()
     {
         return $this->hasMany(DetailPenjualan::class);
     }

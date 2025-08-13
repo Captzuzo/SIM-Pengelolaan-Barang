@@ -76,7 +76,7 @@ class LaporanHarianPage extends Page
     {
         $this->validateOnly('tanggal');
 
-        $penjualans = Penjualan::with('details.barang')
+        $penjualans = Penjualan::with('detail.barang')
             ->whereDate('tanggal', $this->tanggal)
             ->get();
 
@@ -84,7 +84,7 @@ class LaporanHarianPage extends Page
         $totalModal = 0;
 
         foreach ($penjualans as $penjualan) {
-            foreach ($penjualan->details as $detail) {
+            foreach ($penjualan->detail as $detail) {
                 if ($detail->barang) {
                     $totalModal += $detail->barang->harga_beli * $detail->qty;
                 }

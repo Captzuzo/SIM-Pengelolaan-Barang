@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -84,6 +85,21 @@ class Barang extends Model
         return $this->hasOne(BarangJual::class);
     }
 
+    public function stokBarangs()
+    {
+        return $this->hasMany(StokBarang::class, 'barang_id');
+    }
+
+    public function getStokAttribute()
+    {
+        return StokBarang::where('barang_id', $this->id)->sum('stok_sisa');
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withSum('stokBarangs', 'stok_sisa');
+    }
 
     // public function detailBarangBeli()
     // {

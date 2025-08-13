@@ -90,6 +90,7 @@ class BarangBeliResource extends Resource
                                             ->pluck('nama_barang', 'id');
                                     })
                                     ->required()
+                                    ->dehydrated(true)
                                     ->searchable(),
                                 TextInput::make('stok')
                                     ->label('Jumlah')

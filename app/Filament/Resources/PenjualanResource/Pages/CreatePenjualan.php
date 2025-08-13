@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PenjualanResource\Pages;
 use App\Filament\Resources\PenjualanResource;
 use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
+use App\Services\StokService;
 
 class CreatePenjualan extends CreateRecord
 {
@@ -20,12 +21,19 @@ class CreatePenjualan extends CreateRecord
 
     protected function afterCreate(): void
     {
-        foreach ($this->record->details as $detail) {
-            $barang = \App\Models\Barang::find($detail->barang_id);
-            if ($barang) {
-                $barang->stok -= $detail->qty;
-                $barang->save();
-            }
+        // Pastikan detail sudah dimuat
+        $this->record->load('detail');
+
+        foreach ($this->record->detail as $detail) {
+            StokService::keluarkanStokFIFO($detail->barang_id, $detail->qty);
+        }
+    }
+
+    protected function afterSave(): void
+    {
+        $this->record->load('detail');
+        foreach ($this->record->detail as $detail) {
+            StokService::keluarkanStokFIFO($detail->barang_id, $detail->qty);
         }
     }
 }

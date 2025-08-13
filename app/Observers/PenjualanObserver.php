@@ -13,7 +13,7 @@ class PenjualanObserver
 
     public function deleting(Penjualan $penjualan): void
     {
-        foreach ($penjualan->details as $detail) {
+        foreach ($penjualan->detail as $detail) {
             $barang = Barang::find($detail->barang_id);
             if ($barang) {
                 $barang->stok += $detail->qty;

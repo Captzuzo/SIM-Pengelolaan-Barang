@@ -10,6 +10,7 @@
     <thead>
         <tr>
             <th>No. Invoice</th>
+            <th>Barang</th>
             <th>Tanggal</th>
             <th>Total</th>
         </tr>
@@ -18,6 +19,9 @@
         @foreach ($penjualans as $item)
         <tr>
             <td>{{ $item->no_invoice }}</td>
+            <td colspan="2" style="padding-left: 30px;">
+                    - {{ $detail->barang->nama_barang ?? 'Barang tidak ditemukan' }} ({{ $detail->qty }} {{ $detail->barang->satuan ?? '' }})
+                </td>
             <td>{{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}</td>
             <td>Rp {{ number_format($item->total, 0, ',', '.') }}</td>
         </tr>

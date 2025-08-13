@@ -12,7 +12,9 @@ class BarangJual extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
-    protected $fillable = ['barang_id', 'harga_jual'];
+    protected $fillable = [
+        'barang_id', 
+        'harga_jual'];
 
     public function barang()
     {

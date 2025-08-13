@@ -54,17 +54,18 @@ class BarangResource extends Resource
                             ->preload()
                             ->required()
                             ->live()
+                            ->disabled(fn($record) => filled($record)) // Disable jika edit
                             ->afterStateUpdated(function ($state, callable $set) {
                                 $kategori = Kategori::find($state);
 
                                 if (!$kategori) return;
 
-                                $kodeKategori = $kategori->kode_kategori; // Asumsi kamu punya kolom kode_kategori
+                                $kodeKategori = $kategori->kode_kategori; // kolom kode_kategori
 
-                                // Hitung jumlah barang yang sudah ada di kategori itu
+                                // Hitung jumlah barang di kategori itu
                                 $count = Barang::where('kategori_id', $kategori->id)->count() + 1;
 
-                                // Format nomor ke tiga digit
+                                // Format nomor 3 digit
                                 $nomor = str_pad($count, 3, '0', STR_PAD_LEFT);
 
                                 // Format kode_barang
@@ -72,6 +73,7 @@ class BarangResource extends Resource
 
                                 $set('kode_barang', $kodeBarang);
                             }),
+
 
                         Forms\Components\TextInput::make('nama_barang')
                             ->label('Nama Barang')
@@ -111,6 +113,8 @@ class BarangResource extends Resource
                         TextInput::make('harga_beli')
                             ->label('Harga Beli')
                             ->required()
+                            ->dehydrated(true) // <-- WAJIB, supaya ikut tersimpan walaupun disabled
+                            ->disabled(fn($record) => true) // disable di create & edit
                             ->prefix(fn(callable $get) => match ($get('mata_uang')) {
                                 'USD' => '$',
                                 'EUR' => '€',
@@ -141,6 +145,8 @@ class BarangResource extends Resource
                         TextInput::make('harga_jual')
                             ->label('Harga Jual')
                             ->required()
+                            ->dehydrated(true) // <-- WAJIB, supaya ikut tersimpan walaupun disabled
+                            ->disabled(fn($record) => true) // disable create & edit
                             ->prefix(fn(callable $get) => match ($get('mata_uang')) {
                                 'USD' => '$',
                                 'EUR' => '€',
@@ -167,12 +173,15 @@ class BarangResource extends Resource
                             ->dehydrateStateUsing(fn($state) => str_replace('.', '', $state))
                             ->afterStateHydrated(fn($state, callable $set) => $set('harga_jual', number_format($state, 0, ',', '.'))),
 
+                        // Stok
                         Forms\Components\TextInput::make('stok')
                             ->required()
                             ->numeric()
                             ->default(0)
                             ->minValue(0)
-                            ->readOnly(),
+                            ->dehydrated(true) // <-- WAJIB, supaya ikut tersimpan walaupun disabled
+                            ->disabled(fn($record) => true), // disable create & edit
+
 
                         Select::make('satuan')
                             ->label('Satuan')
@@ -278,13 +287,16 @@ class BarangResource extends Resource
                 //         return number_format((float) $total, 0, ',', '.');
                 //     })
                 //     ->sortable(),
+                // Tables\Columns\TextColumn::make('stok')
+                //     ->label('Stok')
+                // Tables\Columns\TextColumn::make('total_stok')
+                //     ->label('Stok')
+                //     ->sortable(),
+
                 Tables\Columns\TextColumn::make('stok')
                     ->label('Stok')
-                    // ->getStateUsing(function ($record) {
-                    //     $total = $record->detailBarangBeli()->sum('stok');
-                    //     return number_format((float) $total, 0, ',', '.');
-                    // })
-                    ->sortable(),
+                    ->sortable()
+                    ->default(0),
 
                 // Tables\Columns\TextColumn::make('harga_satuan')
                 //     ->label('Harga Satuan')
@@ -363,37 +375,82 @@ class BarangResource extends Resource
             //         ->requiresConfirmation()
             //         ->color('success'),
             // ])
+            // ->headerActions([
+            //     Action::make('refresh_data')
+            //         ->label('Refresh Stok & Harga')
+            //         ->icon('heroicon-o-arrow-path')
+            //         ->action(function () {
+            //             DB::transaction(function () {
+            //                 $barangs = \App\Models\Barang::all();
+
+            //                 foreach ($barangs as $barang) {
+            //                     // Hitung stok masuk (dari stok_barangs)
+            //                     $stokMasuk = \App\Models\StokBarang::where('barang_id', $barang->id)->sum('stok');
+
+            //                     // Hitung stok keluar (dari penjualan)
+            //                     $stokKeluar = $barang->detailPenjualan()->sum('qty');
+
+            //                     // Update stok
+            //                     $barang->stok = max(0, $stokMasuk - $stokKeluar);
+
+            //                     // Harga beli terakhir dari stok terbaru
+            //                     $hargaBeliTerakhir = \App\Models\StokBarang::where('barang_id', $barang->id)
+            //                         ->latest('tanggal_beli')
+            //                         ->value('harga_beli');
+            //                     if ($hargaBeliTerakhir) {
+            //                         $barang->harga_beli = $hargaBeliTerakhir;
+            //                     }
+
+            //                     // Harga jual terakhir dari penjualan terbaru
+            //                     $hargaJualTerakhir = $barang->detailPenjualan()
+            //                         ->latest('created_at')
+            //                         ->value('harga_jual');
+            //                     if ($hargaJualTerakhir) {
+            //                         $barang->harga_jual = $hargaJualTerakhir;
+            //                     }
+
+            //                     $barang->save();
+            //                 }
+            //             });
+
+            //             Notification::make()
+            //                 ->title('Stok & harga berhasil diperbarui!')
+            //                 ->success()
+            //                 ->send();
+            //         })
+            //         ->requiresConfirmation()
+            //         ->color('success'),
+            // ])
+
             ->headerActions([
                 Action::make('refresh_data')
                     ->label('Refresh Stok & Harga')
                     ->icon('heroicon-o-arrow-path')
                     ->action(function () {
                         DB::transaction(function () {
-                            $barangs = \App\Models\Barang::all();
+                            $barangs = \App\Models\Barang::with(['detailBarangBeli', 'detailPenjualan', 'barangJual'])->get();
 
                             foreach ($barangs as $barang) {
-                                // Hitung stok masuk dari semua pembelian
-                                $stokMasuk = $barang->detailBarangBeli()->sum('stok');
+                                // Hitung stok masuk & keluar
+                                $stokMasuk = $barang->detailBarangBeli->sum('stok');
+                                $stokKeluar = $barang->detailPenjualan->sum('qty');
 
-                                // Hitung stok keluar dari semua penjualan
-                                $stokKeluar = $barang->detailPenjualan()->sum('qty');
-
-                                // Stok akhir = masuk - keluar
+                                // Update stok
                                 $barang->stok = max(0, $stokMasuk - $stokKeluar);
 
-                                // Ambil harga beli terakhir dari pembelian terbaru
+                                // Harga beli terakhir
                                 $hargaBeliTerakhir = $barang->detailBarangBeli()
                                     ->latest('created_at')
                                     ->value('harga_satuan');
-                                if ($hargaBeliTerakhir !== null) {
+                                if ($hargaBeliTerakhir) {
                                     $barang->harga_beli = $hargaBeliTerakhir;
                                 }
 
-                                // Ambil harga jual terakhir dari penjualan terbaru
+                                // Harga jual terakhir
                                 $hargaJualTerakhir = $barang->barangJual()
                                     ->latest('created_at')
                                     ->value('harga_jual');
-                                if ($hargaJualTerakhir !== null) {
+                                if ($hargaJualTerakhir) {
                                     $barang->harga_jual = $hargaJualTerakhir;
                                 }
 
@@ -409,6 +466,8 @@ class BarangResource extends Resource
                     ->requiresConfirmation()
                     ->color('success'),
             ])
+
+
 
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -435,5 +494,11 @@ class BarangResource extends Resource
             'create' => Pages\CreateBarang::route('/create'),
             'edit' => Pages\EditBarang::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()
+            ->withSum('stokBarangs', 'stok_sisa');
     }
 }
