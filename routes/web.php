@@ -32,4 +32,6 @@ Route::get('/laporan-laba/cetak', [CetakLaporanLabaController::class, 'cetak'])-
 Route::get('/laporan-stok/cetak', [CetakLaporanStokController::class, 'cetak'])->name('laporan-stok.cetak');
 Route::get('/laporan-harian/cetak', [CetakLaporanHarianController::class, 'cetak'])->name('laporan-harian.cetak');
 Route::get('/laporan-bulanan/cetak', [CetakLaporanBulananController::class, 'cetak'])->name('laporan-bulanan.cetak');
-Route::get('/laporan-tahunan/cetak', [CetakLaporanTahunanController::class, 'cetak'])->name('laporan-tahunan.cetak');
+Route::get('/laporan-tahunan/cetak/{tahun}', [CetakLaporanTahunanController::class, 'cetak'])
+    ->name('laporan-tahunan.cetak');
+// Route::get('/laporan-tahunan/cetak', [CetakLaporanTahunanController::class, 'cetak'])->name('laporan-tahunan.cetak');

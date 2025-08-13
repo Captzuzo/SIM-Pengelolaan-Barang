@@ -11,32 +11,40 @@ class CetakLaporanHarianController extends Controller
     public function cetak(Request $request)
     {
         $tanggal = $request->tanggal;
+        $tanggalMulai = $request->query('tanggalMulai');
+        $tanggalSelesai = $request->query('tanggalSelesai');
 
-        $penjualans = Penjualan::with('details.barang')
-            ->whereDate('tanggal', $tanggal)
+        $penjualans = Penjualan::with('detail.barang')
+            ->whereBetween('tanggal', [$tanggalMulai, $tanggalSelesai])
+            ->orderBy('tanggal', 'asc')
             ->get();
 
         $totalPenjualan = $penjualans->sum('total');
         $totalModal = 0;
+        $totalLaba = 0;
 
         foreach ($penjualans as $penjualan) {
-            foreach ($penjualan->details as $detail) {
+            $penjualan->modal = 0;
+            foreach ($penjualan->detail as $detail) {
                 if ($detail->barang) {
-                    $totalModal += $detail->barang->harga_beli * $detail->qty;
+                    $penjualan->modal += $detail->barang->harga_beli * $detail->qty;
                 }
             }
+            $penjualan->laba = $penjualan->total - $penjualan->modal;
+            $totalModal += $penjualan->modal;
+            $totalLaba += $penjualan->laba;
         }
 
-        $totalLaba = $totalPenjualan - $totalModal;
-
-        $pdf = PDF::loadView('pdf.laporan-harian', [
+        $data = [
             'penjualans' => $penjualans,
             'total_penjualan' => $totalPenjualan,
             'total_modal' => $totalModal,
             'total_laba' => $totalLaba,
-            'tanggal' => $tanggal,
-        ]);
+            'tanggalMulai' => $tanggalMulai,
+            'tanggalSelesai' => $tanggalSelesai,
+        ];
 
-        return $pdf->download('laporan-harian-' . $tanggal . '.pdf');
+        $pdf = Pdf::loadView('pdf.laporan-harian', $data);
+        return $pdf->download('laporan-harian-' . $tanggalMulai . '-sampai-' . $tanggalSelesai . '.pdf');
     }
 }

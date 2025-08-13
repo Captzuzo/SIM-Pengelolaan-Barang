@@ -10,7 +10,7 @@ class InvoiceController extends Controller
 {
     public function cetak($id)
     {
-        $penjualan = Penjualan::with('details.barang', 'pelanggan')->findOrFail($id);
+        $penjualan = Penjualan::with('detail.barang', 'pelanggan')->findOrFail($id);
         $pdf = Pdf::loadView('pdf.invoice-penjualan', compact('penjualan'));
         return $pdf->download("Invoice-$penjualan->no_invoice.pdf");
     }

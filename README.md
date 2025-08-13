@@ -92,7 +92,7 @@ php artisan serve
 
 ```bash
 Admin
-email : admin1@example.com
+email : admin@example.com
 password : password
 ```
 

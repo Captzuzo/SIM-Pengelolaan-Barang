@@ -154,7 +154,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach ($penjualan->details as $i => $detail)
+            @foreach ($penjualan->detail as $i => $detail)
                 <tr>
                     <td class="text-center">{{ $i + 1 }}</td>
                     <td>{{ $detail->barang->nama_barang ?? '-' }}</td>

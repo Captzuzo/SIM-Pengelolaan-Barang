@@ -75,14 +75,14 @@ class LaporanLabaPage extends Page implements Forms\Contracts\HasForms
 
     public function generate(): void
     {
-        $penjualans = Penjualan::with('details.barang')->whereBetween('tanggal', [$this->tanggalMulai, $this->tanggalSelesai])->get();
+        $penjualans = Penjualan::with('detail.barang')->whereBetween('tanggal', [$this->tanggalMulai, $this->tanggalSelesai])->get();
 
         $totalPenjualan = $penjualans->sum('total');
         $totalModal = 0;
         $detailPenjualans = [];
 
         foreach ($penjualans as $penjualan) {
-            foreach ($penjualan->details as $detail) {
+            foreach ($penjualan->detail as $detail) {
                 if ($detail->barang) {
                     $totalModal += $detail->barang->harga_beli * $detail->qty;
                 }

@@ -48,7 +48,7 @@ class DashboardOverview extends BaseWidget
                 // ->description('Barang dengan penjualan terbanyak')
                 ->icon('heroicon-o-fire')
                 ->color('warning'),
-            Card::make('Total Uang Masuk', 'Rp ' . number_format(Penjualan::sum('bayar'), 0, ',', '.')),
+            Card::make('Total Uang Masuk', 'Rp ' . number_format(Penjualan::sum('total'), 0, ',', '.')),
             Card::make('Total Piutang', 'Rp ' . number_format(Penjualan::sum('sisa'), 0, ',', '.')),
         ];
     }

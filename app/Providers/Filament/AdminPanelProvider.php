@@ -62,9 +62,9 @@ class AdminPanelProvider extends PanelProvider
             ->pages([
                 Pages\Dashboard::class,
                 LaporanStokPage::class,
-                LaporanLabaPage::class,
+                // LaporanLabaPage::class,
                 LaporanHarianPage::class,
-                LaporanBulananPage::class,
+                // LaporanBulananPage::class,
                 LaporanTahunanPage::class,
             ])
             ->spa()

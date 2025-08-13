@@ -60,13 +60,14 @@
         </div>
 
         {{-- Daftar Semua Barang --}}
-        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 col-span-1 md:col-span-2">
+        <div class="bg-white dark:bg-gray-800 shadow-lg rounded-2xl p-6 w-full col-span-full">
             <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-4">
                 <x-filament::icon name="lucide-archive" />Daftar Semua Barang
             </h2>
 
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                {{-- <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700"> --}}
+                    <table class="w-full divide-y divide-dark-200 dark:divide-dark-700">
                     <thead class="bg-gray-100 dark:bg-gray-700">
                         <tr>
                             <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Nama</th>
@@ -76,7 +77,7 @@
                             <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">Subtotal</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+                    {{-- <tbody class="divide-y divide-gray-200 dark:divide-gray-700"> --}}
                         @foreach ($barangs as $barang)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-900/40">
                                 <td class="px-4 py-2 text-sm text-gray-800 dark:text-gray-200">

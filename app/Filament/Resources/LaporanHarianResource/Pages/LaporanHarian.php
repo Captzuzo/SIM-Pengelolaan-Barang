@@ -3,11 +3,13 @@
 namespace App\Filament\Pages\Laporan;;
 
 use App\Filament\Resources\LaporanHarianResource;
+use App\Models\Barang;
 // use Filament\Pages\Page;
 // use Filament\Resources\Pages\Page;
 
 use App\Models\Penjualan;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Pages\Page;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -17,7 +19,7 @@ class LaporanHarianPage extends Page
     // protected static string $resource = Lapo::class;
     protected static ?string $navigationGroup = 'Laporan';
     protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
-    protected static ?string $title = 'Laporan Harian';
+    protected static ?string $title = 'Laporan Harian / Bulanan';
     protected static ?string $slug = 'laporan-harian';
     protected static ?int $navigationSort = 21;
 
@@ -25,6 +27,17 @@ class LaporanHarianPage extends Page
     // protected static string $view = 'filament.pages.laporan.laporan-stok';
 
     public ?string $tanggal = null;
+
+    public ?string $tanggalMulai = null;
+    public ?string $tanggalSelesai = null;
+    // public array $data = [
+    //     'total_penjualan' => 0,
+    //     'total_modal' => 0,
+    //     'total_laba' => 0,
+    //     'penjualans' => [],
+    // ];
+
+    public $perPage = 10;
 
     public array $data = [];
 
@@ -63,11 +76,23 @@ class LaporanHarianPage extends Page
 
 
 
+    // protected function getFormSchema(): array
+    // {
+    //     return [
+    //         Forms\Components\DatePicker::make('tanggal')
+    //             ->label('Pilih Tanggal')
+    //             ->required(),
+    //     ];
+    // }
+
     protected function getFormSchema(): array
     {
         return [
-            Forms\Components\DatePicker::make('tanggal')
-                ->label('Pilih Tanggal')
+            DatePicker::make('tanggalMulai')
+                ->label('Dari Tanggal')
+                ->required(),
+            DatePicker::make('tanggalSelesai')
+                ->label('Sampai Tanggal')
                 ->required(),
         ];
     }
@@ -77,25 +102,42 @@ class LaporanHarianPage extends Page
         $this->validateOnly('tanggal');
 
         $penjualans = Penjualan::with('detail.barang')
-            ->whereDate('tanggal', $this->tanggal)
+            ->whereBetween('tanggal', [$this->tanggalMulai, $this->tanggalSelesai])
+            ->orderBy('tanggal', 'asc')
             ->get();
+
+        $barang = Barang::all();
+
+        // $penjualans = Penjualan::with('detail.barang')
+        //     ->whereDate('tanggal', $this->tanggal)
+        //     ->get();
+
 
         $totalPenjualan = $penjualans->sum('total');
         $totalModal = 0;
+        $totalModal = 0;
+        $totalLaba = 0;
+
 
         foreach ($penjualans as $penjualan) {
+            $penjualan->modal = 0; // modal per transaksi
             foreach ($penjualan->detail as $detail) {
                 if ($detail->barang) {
-                    $totalModal += $detail->barang->harga_beli * $detail->qty;
+                    $penjualan->modal += $detail->barang->harga_beli * $detail->qty;
                 }
             }
+            $penjualan->laba = $penjualan->total - $penjualan->modal;
+
+            $totalModal += $penjualan->modal;
+            $totalLaba += $penjualan->laba;
         }
 
         $this->data = [
             'penjualans' => $penjualans,
+            'barang' => $barang,
             'total_penjualan' => $totalPenjualan,
             'total_modal' => $totalModal,
-            'total_laba' => $totalPenjualan - $totalModal,
+            'total_laba' => $totalLaba,
         ];
     }
 }
