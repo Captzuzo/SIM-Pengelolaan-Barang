@@ -61,7 +61,7 @@ class LaporanBulananPage extends Page implements HasForms
         $bulan = date('m', strtotime($this->bulan));
         $tahun = date('Y', strtotime($this->bulan));
 
-        $penjualans = Penjualan::with('details.barang')
+        $penjualans = Penjualan::with('detail.barang')
             ->whereMonth('tanggal', $bulan)
             ->whereYear('tanggal', $tahun)
             ->get();
@@ -70,7 +70,7 @@ class LaporanBulananPage extends Page implements HasForms
         $totalModal = 0;
 
         foreach ($penjualans as $penjualan) {
-            foreach ($penjualan->details as $detail) {
+            foreach ($penjualan->detail as $detail) {
                 if ($detail->barang) {
                     $totalModal += $detail->barang->harga_beli * $detail->qty;
                 }
