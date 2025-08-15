@@ -20,7 +20,7 @@ use Filament\Tables\Table;
 class BarangBeliResource extends Resource
 {
     protected static ?string $model = BarangBeli::class;
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static ?string $navigationGroup = 'Manajemen Barang';
     protected static ?string $navigationLabel = 'Barang Beli';
     protected static ?int $navigationSort = 4;

@@ -38,7 +38,7 @@ class PenjualanResource extends Resource
     protected static ?string $navigationLabel = 'Penjualan';
     protected static ?string $slug = 'penjualan';
     protected static ?int $navigationSort = 11;
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
 
     public static function form(Form $form): Form
     {
@@ -96,6 +96,7 @@ class PenjualanResource extends Resource
                                     ->options(function (callable $get) {
                                         // Ambil semua barang
                                         $allBarangs = \App\Models\Barang::all();
+                                        // $allBarangs = \App\Models\Barang::Where('')
 
                                         // Ambil semua barang_id yang sudah dipilih pada repeater
                                         $selectedBarangIds = collect($get('../../detail')) // naik 2 level dari barang_id
@@ -112,18 +113,48 @@ class PenjualanResource extends Resource
                                     ->reactive()
                                     ->preload()
                                     ->afterStateUpdated(function ($state, callable $set) {
+                                        //     $barang = \App\Models\Barang::with('barangJual')->find($state);
+                                        //     if ($barang && $barang->barangJual) {
+                                        //         $set('harga_satuan', $barang->barangJual->harga_jual);
+                                        //         $set('qty', 1);
+                                        //         $set('subtotal', $barang->barangJual->harga_jual);
+                                        //     } else {
+                                        //         $set('harga_satuan', 0);
+                                        //         $set('qty', 1);
+                                        //         $set('subtotal', 0);
+                                        //     }
+                                        // }),
+
                                         $barang = \App\Models\Barang::with('barangJual')->find($state);
-                                        if ($barang && $barang->barangJual) {
-                                            $set('harga_satuan', $barang->barangJual->harga_jual);
-                                            $set('qty', 1);
-                                            $set('subtotal', $barang->barangJual->harga_jual);
-                                        } else {
-                                            $set('harga_satuan', 0);
-                                            $set('qty', 1);
-                                            $set('subtotal', 0);
+
+                                        if ($barang) {
+                                            // ✅ Cek stok 0
+                                            if ($barang->stok <= 0) {
+                                                $set('qty', 0);
+                                                $set('harga_satuan', 0);
+                                                $set('subtotal', 0);
+
+                                                \Filament\Notifications\Notification::make()
+                                                    ->title('Penjualan tidak bisa')
+                                                    ->body('Stok barang "' . $barang->nama_barang . '" kosong.')
+                                                    ->danger()
+                                                    ->send();
+
+                                                return; // hentikan proses
+                                            }
+
+                                            // Set harga & qty default kalau stok tersedia
+                                            if ($barang->barangJual) {
+                                                $set('harga_satuan', $barang->barangJual->harga_jual);
+                                                $set('qty', 1);
+                                                $set('subtotal', $barang->barangJual->harga_jual);
+                                            } else {
+                                                $set('harga_satuan', 0);
+                                                $set('qty', 1);
+                                                $set('subtotal', 0);
+                                            }
                                         }
                                     }),
-
                                 TextInput::make('qty')
                                     ->label('Qty')
                                     ->numeric()

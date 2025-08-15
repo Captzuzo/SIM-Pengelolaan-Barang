@@ -31,7 +31,7 @@ class PelangganResource extends Resource
     protected static ?string $navigationLabel = 'Pelanggan';
     protected static ?string $slug = 'pelanggan';
     protected static ?int $navigationSort = 2;
-    protected static ?string $navigationIcon = 'heroicon-o-User';
+    protected static ?string $navigationIcon = 'heroicon-o-user-group';
 
     public static function form(Form $form): Form
     {

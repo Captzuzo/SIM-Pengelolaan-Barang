@@ -12,7 +12,7 @@ class LaporanStokPage extends Page
     protected static ?string $title = 'Laporan Stok';
     protected static ?string $slug = 'laporan-stok';
     protected static ?string $navigationGroup = 'Laporan';
-    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+    protected static ?string $navigationIcon = 'heroicon-o-chart-bar-square';
     protected static ?int $navigationSort = 20;
     protected static string $view = 'filament.pages.laporan.laporan-stok';
 

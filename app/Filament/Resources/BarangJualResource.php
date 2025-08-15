@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class BarangJualResource extends Resource
 {
     protected static ?string $model = BarangJual::class;
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-bag';
+    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
     protected static ?string $navigationGroup = 'Manajemen Barang';
     protected static ?string $navigationLabel = 'Barang Jual';
     protected static ?int $navigationSort = 4;

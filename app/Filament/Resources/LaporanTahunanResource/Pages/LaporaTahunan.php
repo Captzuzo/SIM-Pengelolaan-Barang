@@ -15,7 +15,7 @@ class LaporanTahunanPage extends Page implements HasForms
     use InteractsWithForms;
 
     protected static ?string $navigationGroup = 'Laporan';
-    protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
+    protected static ?string $navigationIcon = 'heroicon-o-calendar-date-range';
     protected static ?string $title = 'Laporan Tahunan';
     protected static ?string $slug = 'laporan-tahunan';
     protected static ?int $navigationSort = 23;

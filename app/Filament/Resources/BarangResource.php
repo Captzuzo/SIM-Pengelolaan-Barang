@@ -34,7 +34,7 @@ class BarangResource extends Resource
     protected static ?string $slug = 'barang';
     protected static ?int $navigationSort = 3;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-archive-box';
 
     public static function form(Form $form): Form
     {
