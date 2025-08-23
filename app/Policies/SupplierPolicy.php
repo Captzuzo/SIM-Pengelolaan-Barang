@@ -21,7 +21,7 @@ class SupplierPolicy
         if ($user->hasPermissionTo('View Supplier')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**
@@ -45,7 +45,7 @@ class SupplierPolicy
         if ($user->hasPermissionTo('Create Supplier')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**
@@ -61,7 +61,7 @@ class SupplierPolicy
         if ($user->hasPermissionTo('Edit Supplier')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**
@@ -77,7 +77,7 @@ class SupplierPolicy
         if ($user->hasPermissionTo('Delete Supplier')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**

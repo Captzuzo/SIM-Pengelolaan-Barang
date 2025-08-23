@@ -7,8 +7,10 @@ use Illuminate\Support\Str;
 use App\Models\Barang;
 use App\Models\Pelanggan;
 
+
 class Penjualan extends Model
 {
+
     protected $keyType = 'string'; // UUID = string
     public $incrementing = false;
 
@@ -77,5 +79,15 @@ class Penjualan extends Model
             $model->kembalian = max(0, $bayar - $total);
             $model->status_pembayaran = $bayar >= $total ? 'lunas' : 'belum bayar';
         });
+    }
+
+    public function toSearchableArray()
+    {
+        return [
+            'no_invoice' => $this->no_invoice,
+            'status_pembayaran' => $this->status_pembayaran,
+            'tanggal' => $this->tanggal,
+            'total' => $this->total,
+        ];
     }
 }

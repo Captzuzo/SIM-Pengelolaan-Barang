@@ -70,6 +70,10 @@ class StokBarang extends Model
     {
         return $this->belongsTo(BarangBeli::class, 'barang_beli_id', 'id');
     }
+    public function detailBarangBeli()
+    {
+        return $this->belongsTo(DetailBarangBeli::class);
+    }
 
     protected static function booted()
     {

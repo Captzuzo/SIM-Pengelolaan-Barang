@@ -50,6 +50,60 @@ class DetailBarangBeli extends Model
     {
         return $this->belongsTo(Barang::class);
     }
+    public function stokBarangs()
+    {
+        return $this->hasMany(StokBarang::class, 'detail_barang_beli_id');
+    }
+
+
+    protected static function booted()
+    {
+        // Setelah detail pembelian dibuat
+        static::created(function ($detail) {
+            $barang = $detail->barang;
+
+            if ($barang) {
+                // update harga_beli dari harga_satuan
+                $barang->harga_beli = $detail->harga_satuan;
+
+                // update stok juga kalau mau
+                // $barang->stok = $barang->stok + $detail->stok;
+
+                $barang->save();
+            }
+        });
+
+        static::updated(function ($detail) {
+            $barang = $detail->barang;
+
+            if ($barang) {
+                $barang->harga_beli = $detail->harga_satuan;
+                $barang->save();
+            }
+        });
+
+        static::deleting(function ($barangBeli) {
+            // Hapus semua stok barangs terkait
+            $barangBeli->stokBarangs()->each(function ($stok) {
+                $stok->delete();
+            });
+
+            // Ambil semua detail pembelian
+            $barangBeli->detailBarangBeli->each(function ($detail) {
+                $barang = $detail->barang;
+
+                if ($barang) {
+                    // Kurangi stok (balikin jumlah stok yang ditambahkan dari pembelian ini)
+                    $barang->harga_beli = 0; // reset harga beli
+                    $barang->save();
+                }
+
+                // Hapus detail pembelian juga biar konsisten
+                $detail->delete();
+            });
+        });
+
+    }
 
     // Update stok barang otomatis setelah detail pembelian dibuat
     // protected static function booted($request, Request $barangBeli)

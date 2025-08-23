@@ -72,9 +72,9 @@
 </html> --}}
 
 
-
 <!DOCTYPE html>
-<html>
+<html lang="id">
+
 <head>
     <meta charset="utf-8">
     <title>Invoice Penjualan</title>
@@ -82,13 +82,29 @@
         body {
             font-family: Arial, sans-serif;
             font-size: 12px;
-            color: #333;
+            color: #000;
             margin: 20px;
         }
 
+        .clearfix::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .company {
+            float: left;
+            width: 50%;
+        }
+
+        .invoice-title {
+            float: right;
+            width: 50%;
+            text-align: right;
+        }
+
         h2 {
-            text-align: center;
-            margin-bottom: 10px;
+            margin: 0;
             text-transform: uppercase;
         }
 
@@ -96,13 +112,24 @@
             margin: 2px 0;
         }
 
+        .address-block {
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        .address-block .block {
+            float: left;
+            width: 50%;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 10px;
+            margin-top: 15px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #000;
             padding: 6px;
         }
@@ -112,37 +139,70 @@
             text-align: center;
         }
 
-        .text-right {
-            text-align: right;
-        }
-
         .text-center {
             text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
         }
 
         .no-border {
             border: none !important;
         }
 
-        .summary-table td {
-            padding: 4px 6px;
+        .summary {
+            width: 40%;
+            float: right;
+            margin-top: 15px;
+            border-collapse: collapse;
+        }
+
+        .summary td {
+            border: 1px solid #000;
+            padding: 6px;
         }
 
         .footer {
-            margin-top: 30px;
+            margin-top: 40px;
             text-align: center;
             font-style: italic;
         }
     </style>
 </head>
+
 <body>
-    <h2>Invoice Penjualan</h2>
 
-    <p><strong>No. Invoice:</strong> {{ $penjualan->no_invoice }}</p>
-    <p><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($penjualan->tanggal)->format('d-m-Y') }}</p>
-    <p><strong>Pelanggan:</strong> {{ $penjualan->pelanggan->nama ?? 'Umum' }}</p>
-    <p><strong>Kasir:</strong> {{ $penjualan->kasir->name ?? '-' }}</p>
+    <!-- Header -->
+    <div class="clearfix">
+        <div class="company">
+            <strong>Optimus Cell Service & Printing</strong><br>
+            RT.4/RW.3, Pasuruhan Kidul II, Pasuruhan Kidul, Kec. Jati<br>
+            Kabupaten Kudus, Jawa Tengah 59349<br>
+            Telp: 085155052911<br>
+        </div>
+        <div class="invoice-title">
+            <h2>INVOICE</h2>
+            <p><strong>No. Invoice:</strong> {{ $penjualan->no_invoice }}</p>
+            <p><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($penjualan->tanggal)->format('d-m-Y') }}</p>
+        </div>
+    </div>
 
+    <!-- Address Section -->
+    <div class="clearfix address-block">
+        <div class="block">
+            <p><strong>Kepada:</strong></p>
+            <p>{{ $penjualan->pelanggan->nama ?? '-' }}</p>
+            <p>{{ $penjualan->pelanggan->alamat_lengkap ?? '-' }}</p>
+            <p>Telp: {{ $penjualan->pelanggan->no_hp ?? '-' }}</p>
+        </div>
+        <div class="block">
+            <p><strong>Kasir:</strong></p>
+            <p>{{ $penjualan->kasir->name ?? '-' }}</p>
+        </div>
+    </div>
+
+    <!-- Table Items -->
     <table>
         <thead>
             <tr>
@@ -166,29 +226,35 @@
         </tbody>
     </table>
 
-    <table class="summary-table" style="margin-top: 15px;">
+    <!-- Summary -->
+    <table class="summary">
         <tr>
-            <td class="no-border text-right" style="width: 85%;"><strong>Total:</strong></td>
+            <td class="no-border"><strong>Total</strong></td>
             <td class="no-border text-right">Rp {{ number_format($penjualan->total, 0, ',', '.') }}</td>
         </tr>
         <tr>
-            <td class="no-border text-right"><strong>Bayar:</strong></td>
+            <td class="no-border"><strong>Bayar</strong></td>
             <td class="no-border text-right">Rp {{ number_format($penjualan->bayar, 0, ',', '.') }}</td>
         </tr>
         <tr>
-            <td class="no-border text-right"><strong>Piutang:</strong></td>
+            <td class="no-border"><strong>Piutang</strong></td>
             <td class="no-border text-right">Rp {{ number_format($penjualan->sisa, 0, ',', '.') }}</td>
         </tr>
         <tr>
-            <td class="no-border text-right"><strong>Kembalian:</strong></td>
+            <td class="no-border"><strong>Kembalian</strong></td>
             <td class="no-border text-right">Rp {{ number_format($penjualan->kembalian, 0, ',', '.') }}</td>
         </tr>
         <tr>
-            <td class="no-border text-right"><strong>Status Pembayaran:</strong></td>
-            <td class="no-border text-right text-capitalize">{{ ucfirst($penjualan->status_pembayaran) }}</td>
+            <td class="no-border"><strong>Status Pembayaran</strong></td>
+            <td class="no-border text-right">{{ ucfirst($penjualan->status_pembayaran) }}</td>
         </tr>
     </table>
 
+    <div style="clear: both;"></div>
+
+    <!-- Footer -->
     <p class="footer">Terima kasih telah berbelanja di toko kami!</p>
+
 </body>
+
 </html>

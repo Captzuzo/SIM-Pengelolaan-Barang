@@ -21,7 +21,7 @@ class BarangBeliPolicy
         if ($user->hasPermissionTo('View Barang Beli')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**
@@ -45,7 +45,7 @@ class BarangBeliPolicy
         if ($user->hasPermissionTo('Create Barang Beli')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**
@@ -61,7 +61,7 @@ class BarangBeliPolicy
         if ($user->hasPermissionTo('Edit Barang Beli')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**
@@ -77,7 +77,7 @@ class BarangBeliPolicy
         if ($user->hasPermissionTo('Delete Barang Beli')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**

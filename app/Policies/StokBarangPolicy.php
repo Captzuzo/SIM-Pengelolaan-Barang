@@ -13,7 +13,7 @@ class StokBarangPolicy
      */
     public function viewAny(User $user): bool
     {
-        if ($user->hasRole('Admin')) {
+        if ($user->hasRole(['Admin', 'Kasir'])) {
             return true;
         }
 
@@ -21,7 +21,7 @@ class StokBarangPolicy
         if ($user->hasPermissionTo('View Stok Barang')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**
@@ -29,6 +29,10 @@ class StokBarangPolicy
      */
     public function view(User $user, StokBarang $stokBarang): bool
     {
+        if ($user->hasRole(['Admin', 'Kasir'])) {
+            return true;
+        }
+
         return false;
     }
 
@@ -45,7 +49,7 @@ class StokBarangPolicy
         if ($user->hasPermissionTo('Create Stok Barang')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**
@@ -61,7 +65,7 @@ class StokBarangPolicy
         if ($user->hasPermissionTo('Edit Stok Barang')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**
@@ -77,7 +81,7 @@ class StokBarangPolicy
         if ($user->hasPermissionTo('Delete Stok Barang')) {
             return true;
         }
-        // return false;
+        return false;
     }
 
     /**

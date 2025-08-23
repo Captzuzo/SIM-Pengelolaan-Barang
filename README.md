@@ -82,9 +82,11 @@ php artisan migrate
 php artisan db:seed
 ```
 
-## 4. Jalankan Server
+## 4. Generate APP_KEY otomatis dan Jalankan Server
 
 ```bash
+php artisan key:generate
+
 php artisan serve
 ```
 

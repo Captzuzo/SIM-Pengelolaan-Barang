@@ -19,7 +19,7 @@ class BarangPolicy
         // return false;
 
         // Jika role Admin, izinkan semua
-        if ($user->hasRole('Admin')) {
+        if ($user->hasRole(['Admin', 'Kasir'])) {
             return true;
         }
 
@@ -36,7 +36,14 @@ class BarangPolicy
      */
     public function view(User $user, Barang $barang): bool
     {
-        // return $user->hasRole('Admin');
+         if ($user->hasRole('Admin') || $user->hasRole('Kasir')) {
+            return true;
+        }
+
+        if ($user->hasPermissionTo('View Barang')) {
+            return true;
+        }
+
         return false;
     }
 

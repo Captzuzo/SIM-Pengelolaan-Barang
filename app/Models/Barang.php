@@ -101,6 +101,11 @@ class Barang extends Model
             ->withSum('stokBarangs', 'stok_sisa');
     }
 
+    public function mutasi()
+{
+    return $this->hasMany(MutasiStok::class, 'barang_id');
+}
+
     // public function detailBarangBeli()
     // {
     //     return $this->hasMany(DetailBarangBeli::class);

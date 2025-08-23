@@ -30,5 +30,26 @@ class BarangJual extends Model
                 $model->{$model->getKeyName()} = (string) \Illuminate\Support\Str::uuid();
             }
         });
+
+        static::created(function ($barangJual) {
+        $barang = $barangJual->barang;
+
+        if ($barang) {
+            // Update harga_jual ke tabel barangs
+            $barang->harga_jual = $barangJual->harga_jual;
+            $barang->save();
+        }
+    });
+
+        static::updated(function ($barangJual) {
+            $barang = $barangJual->barang;
+
+            if ($barang) {
+                $barang->harga_jual = $barangJual->harga_jual;
+                $barang->save();
+            }
+        });
     }
+
+    
 }

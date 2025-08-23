@@ -295,6 +295,11 @@ class PenjualanResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('No')
+                    ->label('No')
+                    ->getStateUsing(function ($record, $livewire, $column) {
+                        return ($livewire->getTableRecords()->search($record) + 1);
+                    }),
                 TextColumn::make('kasir.name')
                     ->label('Kasir')
                     ->searchable()

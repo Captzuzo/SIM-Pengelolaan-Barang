@@ -422,50 +422,50 @@ class BarangResource extends Resource
             //         ->color('success'),
             // ])
 
-            ->headerActions([
-                Action::make('refresh_data')
-                    ->label('Refresh Stok & Harga')
-                    ->icon('heroicon-o-arrow-path')
-                    ->action(function () {
-                        DB::transaction(function () {
-                            $barangs = \App\Models\Barang::with(['detailBarangBeli', 'detailPenjualan', 'barangJual'])->get();
+            // ->headerActions([
+            //     Action::make('refresh_data')
+            //         ->label('Refresh Stok & Harga')
+            //         ->icon('heroicon-o-arrow-path')
+            //         ->action(function () {
+            //             DB::transaction(function () {
+            //                 $barangs = \App\Models\Barang::with(['detailBarangBeli', 'detailPenjualan', 'barangJual'])->get();
 
-                            foreach ($barangs as $barang) {
-                                // Hitung stok masuk & keluar
-                                $stokMasuk = $barang->detailBarangBeli->sum('stok');
-                                $stokKeluar = $barang->detailPenjualan->sum('qty');
+            //                 foreach ($barangs as $barang) {
+            //                     // Hitung stok masuk & keluar
+            //                     $stokMasuk = $barang->detailBarangBeli->sum('stok');
+            //                     $stokKeluar = $barang->detailPenjualan->sum('qty');
 
-                                // Update stok
-                                $barang->stok = max(0, $stokMasuk - $stokKeluar);
+            //                     // Update stok
+            //                     $barang->stok = max(0, $stokMasuk - $stokKeluar);
 
-                                // Harga beli terakhir
-                                $hargaBeliTerakhir = $barang->detailBarangBeli()
-                                    ->latest('created_at')
-                                    ->value('harga_satuan');
-                                if ($hargaBeliTerakhir) {
-                                    $barang->harga_beli = $hargaBeliTerakhir;
-                                }
+            //                     // Harga beli terakhir
+            //                     $hargaBeliTerakhir = $barang->detailBarangBeli()
+            //                         ->latest('created_at')
+            //                         ->value('harga_satuan');
+            //                     if ($hargaBeliTerakhir) {
+            //                         $barang->harga_beli = $hargaBeliTerakhir;
+            //                     }
 
-                                // Harga jual terakhir
-                                $hargaJualTerakhir = $barang->barangJual()
-                                    ->latest('created_at')
-                                    ->value('harga_jual');
-                                if ($hargaJualTerakhir) {
-                                    $barang->harga_jual = $hargaJualTerakhir;
-                                }
+            //                     // Harga jual terakhir
+            //                     $hargaJualTerakhir = $barang->barangJual()
+            //                         ->latest('created_at')
+            //                         ->value('harga_jual');
+            //                     if ($hargaJualTerakhir) {
+            //                         $barang->harga_jual = $hargaJualTerakhir;
+            //                     }
 
-                                $barang->save();
-                            }
-                        });
+            //                     $barang->save();
+            //                 }
+            //             });
 
-                        Notification::make()
-                            ->title('Stok & harga berhasil diperbarui dari riwayat!')
-                            ->success()
-                            ->send();
-                    })
-                    ->requiresConfirmation()
-                    ->color('success'),
-            ])
+            //             Notification::make()
+            //                 ->title('Stok & harga berhasil diperbarui dari riwayat!')
+            //                 ->success()
+            //                 ->send();
+            //         })
+            //         ->requiresConfirmation()
+            //         ->color('success'),
+            // ])
 
 
 
