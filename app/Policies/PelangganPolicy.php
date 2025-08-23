@@ -13,7 +13,7 @@ class PelangganPolicy
      */
     public function viewAny(User $user): bool
     {
-        if ($user->hasRole('Admin')) {
+        if ($user->hasRole(['Admin', 'Kasir'])) {
             return true;
         }
         if ($user->hasPermissionTo('View Pelanggan')) {
@@ -27,6 +27,9 @@ class PelangganPolicy
      */
     public function view(User $user, Pelanggan $pelanggan): bool
     {
+        if ($user->hasRole(['Admin', 'Kasir'])) {
+            return true;
+        }
         return false;
     }
 

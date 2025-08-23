@@ -13,6 +13,12 @@ class MutasiStokPolicy
      */
     public function viewAny(User $user): bool
     {
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+        if ($user->hasPermissionTo('View Mutasi')) {
+            return true;
+        }
         return false;
     }
 
@@ -21,6 +27,12 @@ class MutasiStokPolicy
      */
     public function view(User $user, MutasiStokModel $mutasiStokModel): bool
     {
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+        if ($user->hasPermissionTo('View Mutasi')) {
+            return true;
+        }
         return false;
     }
 
@@ -29,6 +41,12 @@ class MutasiStokPolicy
      */
     public function create(User $user): bool
     {
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+        if ($user->hasPermissionTo('Create Mutasi')) {
+            return true;
+        }
         return false;
     }
 
@@ -37,6 +55,12 @@ class MutasiStokPolicy
      */
     public function update(User $user, MutasiStokModel $mutasiStokModel): bool
     {
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+        if ($user->hasPermissionTo('Edit Mutasi')) {
+            return true;
+        }
         return false;
     }
 
@@ -45,6 +69,12 @@ class MutasiStokPolicy
      */
     public function delete(User $user, MutasiStokModel $mutasiStokModel): bool
     {
+        if ($user->hasRole('Admin')) {
+            return true;
+        }
+        if ($user->hasPermissionTo('Delete Mutasi')) {
+            return true;
+        }
         return false;
     }
 
