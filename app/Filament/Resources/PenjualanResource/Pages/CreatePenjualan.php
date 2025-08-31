@@ -19,13 +19,26 @@ class CreatePenjualan extends CreateRecord
         return 'Penjualan Berhasil Dibuat';
     }
 
+    // protected function afterCreate(): void
+    // {
+    //     // Pastikan detail sudah dimuat
+    //     $this->record->load('detail');
+
+    //     foreach ($this->record->detail as $detail) {
+    //         StokService::keluarkanStokFIFO($detail->barang_id, $detail->qty);
+    //     }
+    // }
+
     protected function afterCreate(): void
     {
-        // Pastikan detail sudah dimuat
         $this->record->load('detail');
-
         foreach ($this->record->detail as $detail) {
-            StokService::keluarkanStokFIFO($detail->barang_id, $detail->qty);
+            StokService::keluarkanStokFIFO(
+                $detail->barang_id,
+                $detail->qty,
+                $this->record->id, // simpan penjualan_id
+                'Penjualan #' . $this->record->no_invoice
+            );
         }
     }
 

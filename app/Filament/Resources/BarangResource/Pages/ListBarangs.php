@@ -14,6 +14,7 @@ class ListBarangs extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
+
         ];
     }
 }

@@ -26,6 +26,8 @@ use Filament\Tables\Actions\Action;
 use Illuminate\Support\Facades\DB;
 use Filament\Notifications;
 use Filament\Notifications\Notification;
+use Filament\Resources\RelationManagers\RelationManager;
+use App\Filament\Resources\BarangResource\Pages\ViewStok;
 
 class BarangResource extends Resource
 {
@@ -470,8 +472,16 @@ class BarangResource extends Resource
 
 
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->url(fn ($record) => \App\Filament\Resources\BarangResource\Pages\ViewStok::getUrl(['record' => $record->id]))
+                    ->label('Stok'),
+                // Tables\Actions\EditAction::make(),
+                Action::make('edit')
+                    ->icon('heroicon-m-pencil-square')
+                    ->iconButton(),
+                Tables\Actions\DeleteAction::make()
+                    ->icon('heroicon-m-trash')
+                    ->iconButton(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -484,6 +494,7 @@ class BarangResource extends Resource
     {
         return [
             //
+            RelationManagers\StokBarangsRelationManager::class,
         ];
     }
 
@@ -493,6 +504,7 @@ class BarangResource extends Resource
             'index' => Pages\ListBarangs::route('/'),
             'create' => Pages\CreateBarang::route('/create'),
             'edit' => Pages\EditBarang::route('/{record}/edit'),
+            'view-stok' => Pages\ViewStok::route('/{record}/view'),
         ];
     }
 

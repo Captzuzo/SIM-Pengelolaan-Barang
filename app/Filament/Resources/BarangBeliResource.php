@@ -16,6 +16,12 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Tables\Actions\ViewAction;
+use Filament\Notifications\Notification;
+use Filament\Forms\Set;
+use Illuminate\Support\Facades\Auth;
+use Filament\Forms\Get;
+use Filament\Forms\Components\Hidden;
 
 class BarangBeliResource extends Resource
 {
@@ -157,23 +163,29 @@ class BarangBeliResource extends Resource
                     ->label('Supplier')
                     ->searchable(),
 
+                Tables\Columns\TextColumn::make('stokBarang.stok_sisa')
+                    ->label('Stok')
+                    ->searchable(),
+
                 Tables\Columns\TextColumn::make('tanggal_beli')
                     ->date('d-m-Y'),
-                Tables\Columns\TextColumn::make('created_at')->dateTime(),
+                // Tables\Columns\TextColumn::make('created_at')->dateTime(),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\Action::make('invoice-barangBeli')
-                    ->label('Cetak')
-                    ->icon('heroicon-o-printer')
-                    ->url(fn(BarangBeli $record) => route('barangBeli.barang-beli', $record->id))
-                    ->openUrlInNewTab(),
+                // Tables\Actions\Action::make('invoice-barangBeli')
+                //     ->label('Cetak')
+                //     ->icon('heroicon-o-printer')
+                //     ->url(fn(BarangBeli $record) => route('barangBeli.barang-beli', $record->id))
+                //     ->openUrlInNewTab(),
 
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
                 Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ]);
     }
 
@@ -183,6 +195,7 @@ class BarangBeliResource extends Resource
             'index' => Pages\ListBarangBelis::route('/'),
             'create' => Pages\CreateBarangBeli::route('/create'),
             'edit' => Pages\EditBarangBeli::route('/{record}/edit'),
+            // 'view' => Pages\ListBarangBelis::route('/{record}'),
         ];
     }
 }
