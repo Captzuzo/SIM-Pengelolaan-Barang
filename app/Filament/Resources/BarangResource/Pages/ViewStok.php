@@ -14,7 +14,7 @@ class ViewStok extends Page implements Tables\Contracts\HasTable
 {
     use Tables\Concerns\InteractsWithTable;
 
-    protected static string $resource = BarangResource::class;
+    protected static string $resource  = BarangResource::class;
     protected static string $relationship = 'stokBarangs';
     protected static string $view = 'filament.resources.barang-resource.pages.view-stok';
 

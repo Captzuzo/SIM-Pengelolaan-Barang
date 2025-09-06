@@ -475,10 +475,12 @@ class BarangResource extends Resource
                 Tables\Actions\ViewAction::make()
                     ->url(fn ($record) => \App\Filament\Resources\BarangResource\Pages\ViewStok::getUrl(['record' => $record->id]))
                     ->label('Stok'),
-                // Tables\Actions\EditAction::make(),
-                Action::make('edit')
+                Tables\Actions\EditAction::make()
                     ->icon('heroicon-m-pencil-square')
                     ->iconButton(),
+                // Tables\Actions\DeleteAction::make('edit')
+                //     ->icon('heroicon-m-pencil-square')
+                //     ->iconButton(),
                 Tables\Actions\DeleteAction::make()
                     ->icon('heroicon-m-trash')
                     ->iconButton(),
