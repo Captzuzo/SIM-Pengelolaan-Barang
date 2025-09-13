@@ -3,6 +3,7 @@
 namespace App\Filament\Pages\Laporan;
 
 use App\Models\Barang;
+use App\Models\DetailPenjualan;
 use App\Models\Penjualan;
 use Filament\Forms;
 use Filament\Forms\Components\Select;
@@ -50,16 +51,6 @@ class LaporanTahunanPage extends Page implements HasForms
         return false;
     }
 
-    // protected function getFormSchema(): array
-    // {
-    //     return [
-    //         Forms\Components\Select::make('tahun')
-    //             ->label('Pilih Tahun')
-    //             ->options($this->getTahunOptions())
-    //             ->required()
-    //             ->searchable()
-    //     ];
-    // }
     protected function getFormSchema(): array
     {
         $tahunSekarang = date('Y');
@@ -73,71 +64,146 @@ class LaporanTahunanPage extends Page implements HasForms
         ];
     }
 
-    protected function getTahunOptions(): array
-    {
-        $years = Penjualan::selectRaw('YEAR(tanggal) as year')
-            ->groupBy('year')
-            ->orderByDesc('year')
-            ->pluck('year')
-            ->toArray();
+    // public function generate()
+    // {
+    //     $this->validate([
+    //         'tahun' => 'required|digits:4',
+    //     ]);
 
-        $options = [];
-        foreach ($years as $year) {
-            $options[$year] = $year;
-        }
+    //     // $penjualans = Penjualan::with('detail.barang')
+    //     //     ->whereYear('tanggal', $this->tahun)
+    //     //     ->orderBy('tanggal', 'asc')
+    //     //     ->get();
 
-        return $options;
-    }
+    //     // $penjualans = DetailPenjualan::with('barang')
+    //     //     ->selectRaw('barang_id, SUM(qty) as total_terjual')
+    //     //     ->groupBy('barang_id')
+    //     //     ->orderByDesc('total_terjual')
+    //     //     ->first();
+
+    //     // $totalPenjualan = $penjualans->sum('total');
+
+    //     $penjualans = DetailPenjualan::with('barang')
+    //     ->whereHas('penjualan', fn($q) => $q->whereYear('tanggal', $this->tahun))
+    //     ->selectRaw('barang_id, SUM(qty) as total_terjual, SUM(subtotal) as total_subtotal')
+    //     ->groupBy('barang_id')
+    //     ->get();
+
+    //     $totalPenjualan = $penjualans->sum('total_subtotal');
+
+    //     $barang = Barang::all();
+
+    //     // $totalPenjualan = $penjualans->sum('total'); // omzet
+    //     $totalModal     = 0;
+    //     $totalLaba      = 0;
+    //     // $totalBarangTerjual = 0;
+    //     $totalBarangTerjual += $penjualans->barang_terjual;
+    //     $totalPiutang   = 0;
+
+    //     foreach ($penjualans as $penjualan) {
+    //         $penjualan->modal = 0;
+    //         $penjualan->barang_terjual = 0;
+
+    //         foreach ($penjualan->detail as $detail) {
+    //             if ($detail->barang) {
+    //                 $penjualan->modal += $detail->barang->harga_beli * $detail->qty;
+    //                 $penjualan->barang_terjual += $detail->qty;
+    //             }
+    //         }
+
+    //         $penjualan->laba = $penjualan->total - $penjualan->modal;
+
+    //         $totalModal += $penjualan->modal;
+    //         $totalLaba += $penjualan->laba;
+    //         $totalBarangTerjual += $penjualan->barang_terjual;
+
+    //         // hitung piutang (jika status pembayaran belum lunas / masih ada sisa)
+    //         if ($penjualan->status_pembayaran !== 'lunas') {
+    //             $totalPiutang += $penjualan->sisa; // pastikan ada kolom "sisa" di tabel
+    //         }
+    //     }
+
+    //     $this->data = [
+    //         // 'terlaris'             => $terlaris,
+    //         'penjualans'          => $penjualans,
+    //         'barang'              => $barang,
+    //         'total_penjualan'     => $totalPenjualan,
+    //         'total_modal'         => $totalModal,
+    //         'total_laba'          => $totalLaba,
+    //         'total_barang_terjual'=> $totalBarangTerjual,
+    //         'total_piutang'       => $totalPiutang,
+    //     ];
+    // }
 
     public function generate()
     {
-        // $this->validateOnly('tahun');
         $this->validate([
             'tahun' => 'required|digits:4',
         ]);
 
-        $penjualans = Penjualan::with('detail.barang')
-            ->whereYear('tanggal', $this->tahun)
-            ->orderBy('tanggal', 'asc')
+        // $penjualans = Penjualan::with('detail.barang')
+        //     ->whereBetween('tanggal', [$mulai, $selesai])
+        //     ->orderBy('tanggal', 'asc')
+        //     ->get();
+
+        // Ambil detail penjualan per barang (rekap tahunan)
+        $penjualans = DetailPenjualan::with('penjualan.barang')
+            ->whereHas('penjualan', fn($q) => $q->whereYear('tanggal', $this->tahun))
+            ->selectRaw('barang_id, SUM(qty) as total_terjual, SUM(subtotal) as total_subtotal')
+            ->groupBy('barang_id')
             ->get();
 
-        $barang = Barang::all();
-        $totalPenjualan = $penjualans->sum('total');
+        $rekap = [];
+
+        $totalPenjualan = 0;
         $totalModal = 0;
         $totalLaba = 0;
+        $totalPiutang = 0;
 
-        // foreach ($penjualans as $penjualan) {
-        //     foreach ($penjualan->detail as $detail) {
-        //         if ($detail->barang) {
-        //             $totalModal += $detail->barang->harga_beli * $detail->qty;
-        //         }
-        //     }
-        // }
-        foreach ($penjualans as $penjualan) {
-            $penjualan->modal = 0;
-            foreach ($penjualan->detail as $detail) {
-                if ($detail->barang) {
-                    $penjualan->modal += $detail->barang->harga_beli * $detail->qty;
-                }
+        foreach ($penjualans as $p) {
+            $barang = $p->barang;
+
+            if (!$barang) {
+                continue;
             }
-            $penjualan->laba = $penjualan->total - $penjualan->modal;
 
-            $totalModal += $penjualan->modal;
-            $totalLaba += $penjualan->laba;
+            $modal = $barang->harga_beli * $p->total_terjual;
+            $laba  = $p->total_subtotal - $modal;
+
+            // Hitung piutang dari semua penjualan barang ini
+            $piutang = DetailPenjualan::where('barang_id', $p->barang_id)
+                ->whereHas('penjualan', fn($q) => $q
+                    ->whereYear('tanggal', $this->tahun)
+                    ->where('status_pembayaran', '!=', 'lunas')
+                )
+                ->sum('subtotal');
+
+            $rekap[] = [
+                'nama_barang'   => $barang->nama_barang,
+                'terjual'       => $p->total_terjual,
+                'harga_beli'    => $barang->harga_beli,
+                'harga_jual'    => $barang->harga_jual,
+                'subtotal'      => $p->total_subtotal,
+                'piutang'       => $piutang,
+                'laba'          => $laba,
+            ];
+
+            $totalPenjualan += $p->total_subtotal;
+            $totalModal     += $modal;
+            $totalLaba      += $laba;
+            $totalPiutang   += $piutang;
         }
 
-        // $this->data = [
-        //     'penjualans' => $penjualans,
-        //     'total_penjualan' => $totalPenjualan,
-        //     'total_modal' => $totalModal,
-        //     'total_laba' => $totalPenjualan - $totalModal,
-        // ];
         $this->data = [
-            'penjualans' => $penjualans,
-            'barang' => $barang,
+            'penjualans'      => $penjualans,
+            'rekap'           => $rekap,
             'total_penjualan' => $totalPenjualan,
-            'total_modal' => $totalModal,
-            'total_laba' => $totalLaba,
+            'total_modal'     => $totalModal,
+            'total_laba'      => $totalLaba,
+            'total_piutang'   => $totalPiutang,
         ];
     }
+
+
+
 }

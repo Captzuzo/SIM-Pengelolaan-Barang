@@ -102,9 +102,7 @@
                 <th>Harga Beli</th>
                 <th>Harga Jual</th>
                 <th>Subtotal</th>
-                <th>Bayar</th>
                 <th>Piutang</th>
-                <th>Kembalian</th>
                 <th>Laba</th>
             </tr>
         </thead>
@@ -139,13 +137,16 @@
                         <td>Rp {{ number_format($detail->barang->harga_beli ?? 0, 0, ',', '.') }}</td>
                         <td>Rp {{ number_format($detail->barang->harga_jual ?? 0, 0, ',', '.') }}</td>
                         <td>Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
-                        <td>Rp {{ number_format($item->bayar, 0, ',', '.') }}</td>
+                        {{-- <td>Rp {{ number_format($item->bayar, 0, ',', '.') }}</td> --}}
                         <td>Rp {{ number_format($item->sisa, 0, ',', '.') }}</td>
-                        <td>Rp {{ number_format($item->kembalian, 0, ',', '.') }}</td>
-                        @if ($loop->first)
+                        {{-- @if ($loop->first)
                             <td rowspan="{{ $item->detail->count() }}">
                                 Rp {{ number_format($item->laba, 0, ',', '.') }}
                             </td>
+                        @endif --}}
+                        @if ($loop->first)
+                            <td rowspan="{{ $item->detail->count() }}">Rp
+                                {{ number_format($item->laba, 0, ',', '.') }}</td>
                         @endif
                     </tr>
                 @endforeach
@@ -153,14 +154,13 @@
 
             {{-- TOTAL --}}
             <tr class="total-row">
-                <td colspan="4" class="text-right">Total</td>
-                <td class="border px-2 py-1">{{ number_format($total_Qty, 0, ',', '.') }}</td>
-                <td class="border px-2 py-1">Rp {{ number_format($totalBarangBeli, 0, ',', '.') }}</td>
-                <td class="border px-2 py-1">Rp {{ number_format($totalBarangJual, 0, ',', '.') }}</td>
+                <td colspan="3" class="text-left">Total</td>
+                <td>{{ number_format($totalQty, 0, ',', '.') }}</td>
+                <td>Rp {{ number_format($totalBarangBeli, 0, ',', '.') }}</td>
+                <td>Rp {{ number_format($totalBarangJual, 0, ',', '.') }}</td>
                 <td>Rp {{ number_format($totalSubtotal, 0, ',', '.') }}</td>
                 <td>Rp {{ number_format($totalBayar, 0, ',', '.') }}</td>
                 <td>Rp {{ number_format($totalPiutang, 0, ',', '.') }}</td>
-                <td>Rp {{ number_format($totalKembalian, 0, ',', '.') }}</td>
                 <td>Rp {{ number_format($total_laba, 0, ',', '.') }}</td>
             </tr>
         </tbody>

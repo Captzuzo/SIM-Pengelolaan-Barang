@@ -12,6 +12,8 @@ use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Blade;
 use Filament\Navigation\UserMenuItem;
 use Filament\Support\Facades\FilamentView;
+use Filament\Support\Facades\FilamentAsset;
+use Filament\Support\Assets\Js;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -58,5 +60,9 @@ class AppServiceProvider extends ServiceProvider
             'filament::user-menu.before',
             fn(): string => view('components.logout-modal')->render(),
         );
+
+        FilamentAsset::register([
+            Js::make('flatpickr-locale-id', 'https://npmcdn.com/flatpickr/dist/l10n/id.js'),
+        ]);
     }
 }

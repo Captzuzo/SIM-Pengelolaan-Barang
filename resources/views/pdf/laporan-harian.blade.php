@@ -50,6 +50,7 @@
     <table>
         <thead>
             <tr>
+                <th>No</th>
                 <th>No Invoice</th>
                 <th>Tanggal</th>
                 <th>Nama Barang</th>
@@ -80,15 +81,66 @@
                         $totalKembalian += $penjualan->kembalian;
                     @endphp
                     <tr>
-                        <td>{{ $penjualan->no_invoice }}</td>
-                        <td>{{ \Carbon\Carbon::parse($penjualan->tanggal)->format('d-m-Y') }}</td>
-                        <td class="text-left">{{ $detail->barang->nama_barang ?? 'Barang dihapus' }}</td>
-                        <td>{{ $detail->qty }}</td>
-                        <td>Rp {{ number_format($detail->barang->harga_beli, 0, ',', '.') }}</td>
-                        <td>Rp {{ number_format($detail->barang->harga_jual, 0, ',', '.') }}</td>
-                        <td>Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
-                        <td>Rp {{ number_format($penjualan->bayar, 0, ',', '.') }}</td>
-                        <td>Rp {{ number_format($penjualan->sisa, 0, ',', '.') }}</td>
+                        {{-- <td>{{ $loop->parent->iteration }}</td> --}}
+                        @if ($loop->first)
+                            <td rowspan="{{ $penjualan->detail->count() }}">
+                                {{ $loop->parent->iteration }}
+                            </td>
+                        @endif
+                        {{-- <td>{{ $penjualan->no_invoice }}</td> --}}
+                        @if ($loop->first)
+                            <td rowspan="{{ $penjualan->detail->count() }}">
+                                {{ $penjualan->no_invoice }}
+                            </td>
+                        @endif
+                        {{-- <td>{{ \Carbon\Carbon::parse($penjualan->tanggal)->format('d-m-Y') }}</td> --}}
+                        @if ($loop->first)
+                            <td rowspan="{{ $penjualan->detail->count() }}">
+                                {{ \Carbon\Carbon::parse($penjualan->tanggal)->format('d-m-Y') }}
+                            </td>
+                        @endif
+                        {{-- <td class="text-left">{{ $detail->barang->nama_barang ?? 'Barang dihapus' }}</td> --}}
+                        @if ($loop->first)
+                            <td rowspan="{{ $penjualan->detail->count() }}">
+                                {{ $detail->barang->nama_barang ?? 'Barang dihapus' }}
+                            </td>
+                        @endif
+                        {{-- <td>{{ $detail->qty }}</td> --}}
+                        @if ($loop->first)
+                            <td rowspan="{{ $penjualan->detail->count() }}">
+                                {{ $detail->qty }}
+                            </td>
+                        @endif
+                        {{-- <td>Rp {{ number_format($detail->barang->harga_beli, 0, ',', '.') }}</td> --}}
+                        @if ($loop->first)
+                            <td rowspan="{{ $penjualan->detail->count() }}">
+                                {{ number_format($detail->barang->harga_beli, 0, ',', '.') }}
+                            </td>
+                        @endif
+                        {{-- <td>Rp {{ number_format($detail->barang->harga_jual, 0, ',', '.') }}</td> --}}
+                        @if ($loop->first)
+                            <td rowspan="{{ $penjualan->detail->count() }}">
+                                {{ number_format($detail->barang->harga_jual, 0, ',', '.') }}
+                            </td>
+                        @endif
+                        {{-- <td>Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td> --}}
+                        @if ($loop->first)
+                            <td rowspan="{{ $penjualan->detail->count() }}">
+                                {{ number_format($detail->subtotal, 0, ',', '.') }}
+                            </td>
+                        @endif
+                        {{-- <td>Rp {{ number_format($penjualan->bayar, 0, ',', '.') }}</td> --}}
+                        @if ($loop->first)
+                            <td rowspan="{{ $penjualan->detail->count() }}">
+                                {{ number_format($penjualan->bayar, 0, ',', '.') }}
+                            </td>
+                        @endif
+                        {{-- <td>Rp {{ number_format($penjualan->sisa, 0, ',', '.') }}</td> --}}
+                        @if ($loop->first)
+                            <td rowspan="{{ $penjualan->detail->count() }}">
+                                {{ number_format($penjualan->sisa, 0, ',', '.') }}
+                            </td>
+                        @endif
                         {{-- <td>Rp {{ number_format($penjualan->kembalian, 0, ',', '.') }}</td> --}}
                         @if ($loop->first)
                             <td rowspan="{{ $penjualan->detail->count() }}">Rp
@@ -99,7 +151,7 @@
             @endforeach
 
             <tr class="total-row">
-                <td colspan="3" class="text-left">Total Keseluruhan</td>
+                <td colspan="3" class="text-left">Total</td>
                 <td>Rp {{ number_format($totalQty, 0, ',', '.') }}</td>
                 <td>Rp {{ number_format($totalBarangBeli, 0, ',', '.') }}</td>
                 <td>Rp {{ number_format($totalBarangJual, 0, ',', '.') }}</td>

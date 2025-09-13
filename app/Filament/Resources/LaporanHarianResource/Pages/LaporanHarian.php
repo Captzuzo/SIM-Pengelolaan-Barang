@@ -8,8 +8,10 @@ use App\Models\Barang;
 // use Filament\Resources\Pages\Page;
 
 use App\Models\Penjualan;
+use Carbon\Carbon;
 use Filament\Forms;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Pages\Page;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -88,25 +90,56 @@ class LaporanHarianPage extends Page
 
     protected function getFormSchema(): array
     {
+        $tanggalMulai = $this->tanggalMulai;
+        $tanggalSelesai = $this->tanggalSelesai;
+        // $formattedDate = $tanggalMulai->format('d-m-Y');
         return [
+            // DateTimePicker::make('tanggalMulai')
+            // DatePicker::make('tanggalMulai')
+            //     ->label('Dari Tanggal')
+            //     ->format('d/m/Y')
+            //     ->required(),
+            // DatePicker::make('tanggalSelesai')
+            //     ->label('Sampai Tanggal')
+            //     ->format('d/m/Y')
+            //     ->required(),
+
             DatePicker::make('tanggalMulai')
                 ->label('Dari Tanggal')
+                ->placeholder('DD-MM-YY')
+                ->displayFormat('d-m-Y')
+                ->native(false)
+                ->format('Y-m-d') // untuk database
                 ->required(),
+
             DatePicker::make('tanggalSelesai')
                 ->label('Sampai Tanggal')
+                ->placeholder('DD-MM-YY')
+                ->displayFormat('d-m-Y')
+                ->native(false)
+                ->format('Y-m-d') // untuk database
                 ->required(),
         ];
     }
 
     public function generate()
     {
-        $this->validateOnly('tanggal');
+        // $this->validateOnly('tanggal');
+        $mulai = \Carbon\Carbon::parse($this->tanggalMulai)->startOfDay();
+        $selesai = \Carbon\Carbon::parse($this->tanggalSelesai)->endOfDay();
+
+        // 🚨 Validasi: rentang waktu maksimal 1 bulan (<= 31 hari)
+        if ($mulai->diffInDays($selesai) > 31) {
+            $this->addError('tanggalSelesai', 'Rentang tanggal maksimal hanya 1 bulan.');
+            return;
+        }
 
         $penjualans = Penjualan::with('detail.barang')
-            ->whereBetween('tanggal', [$this->tanggalMulai, $this->tanggalSelesai])
+            ->whereBetween('tanggal', [$mulai, $selesai])
             ->orderBy('tanggal', 'asc')
-            // ->paginate($this->perPage);
             ->get();
+
+         // convert input ke Carbon
 
         $barang = Barang::all();
 

@@ -1,5 +1,6 @@
 <?php
 
+use App\Exports\LaporanHarianExport;
 use App\Http\Controllers\BarangBeliController;
 use App\Http\Controllers\CetakLaporanBulananController;
 use App\Http\Controllers\CetakLaporanHarianController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\CetakLaporanStokController;
 use App\Http\Controllers\CetakLaporanTahunanController;
 use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
 
 // Route::get('/', function () {
 //     return view('landingpage');
@@ -34,4 +36,9 @@ Route::get('/laporan-harian/cetak', [CetakLaporanHarianController::class, 'cetak
 Route::get('/laporan-bulanan/cetak', [CetakLaporanBulananController::class, 'cetak'])->name('laporan-bulanan.cetak');
 Route::get('/laporan-tahunan/cetak/{tahun}', [CetakLaporanTahunanController::class, 'cetak'])
     ->name('laporan-tahunan.cetak');
+Route::get('/laporan-harian/excel', function () {
+    $tanggalMulai   = request('tanggalMulai');
+    $tanggalSelesai = request('tanggalSelesai');
+    return Excel::download(new LaporanHarianExport($tanggalMulai, $tanggalSelesai), 'laporan-harian.xlsx');
+})->name('laporan-harian.excel');
 // Route::get('/laporan-tahunan/cetak', [CetakLaporanTahunanController::class, 'cetak'])->name('laporan-tahunan.cetak');

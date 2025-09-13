@@ -69,81 +69,66 @@
                     Belum Bayar
                 </button>
             </div> --}}
-            <div class="overflow-x-auto">
-                <table class="w-full border-collapse text-sm">
-                    <thead>
-                        <tr class="bg-dark-100 text-dark-800">
-                            <th class="border px-2 py-2">No. Invoice</th>
-                            <th class="border px-2 py-2">Tanggal</th>
-                            <th class="border px-2 py-2">Nama Barang</th>
-                            <th class="border px-2 py-2">Qty</th>
-                            <th class="border px-2 py-2">Harga Beli</th>
-                            <th class="border px-2 py-2">Harga Jual</th>
-                            <th class="border px-2 py-2">Subtotal</th>
-                            <th class="border px-2 py-2">Piutang</th>
-                            <th class="border px-2 py-2">Laba</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php
-                            $totalQty = 0;
-                            $totalBarangBeli = 0;
-                            $totalBarangJual = 0;
-                            $totalSubtotal = 0;
-                            $totalBayar = 0;
-                            $totalPiutang = 0;
-                            $totalKembalian = 0;
-                        @endphp
+            <div class="mt-8 bg-dark p-4 rounded-lg shadow-sm border">
+                <h2 class="text-lg font-bold mb-4">Detail Penjualan (Rekap Tahunan)</h2>
 
-                        @foreach ($data['penjualans'] as $item)
-                            @foreach ($item->detail as $detail)
-                                @php
-                                    $totalQty += $detail->qty;
-                                    $totalBarangBeli += $detail->barang->harga_beli * $detail->qty;
-                                    $totalBarangJual += $detail->barang->harga_jual * $detail->qty;
-                                    $totalSubtotal += $detail->subtotal;
-                                    $totalBayar += $item->bayar;
-                                    $totalPiutang += $item->sisa;
-                                    $totalKembalian += $item->kembalian;
-                                @endphp
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-sm">
+                        <thead>
+                            <tr class="bg-dark-100 text-dark-800 text-center">
+                                <th class="border px-2 py-2">No</th>
+                                <th class="border px-2 py-2">Nama Barang</th>
+                                <th class="border px-2 py-2">Terjual</th>
+                                <th class="border px-2 py-2">Harga Beli</th>
+                                <th class="border px-2 py-2">Harga Jual</th>
+                                <th class="border px-2 py-2">Subtotal</th>
+                                <th class="border px-2 py-2">Piutang</th>
+                                <th class="border px-2 py-2">Laba</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php
+                                $totalTerjual = 0;
+                            @endphp
+                            @foreach ($data['rekap'] as $i => $item)
+                                @php $totalTerjual += $item['terjual']; @endphp
                                 <tr class="text-center">
-                                    <td class="border px-2 py-1">{{ $item->no_invoice }}</td>
-                                    <td class="border px-2 py-1">
-                                        {{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}</td>
-                                    <td class="border px-2 py-1">{{ $detail->barang->nama_barang ?? 'Barang dihapus' }}
-                                    </td>
-                                    <td class="border px-2 py-1">{{ $detail->qty }}</td>
+                                    <td class="border px-2 py-1">{{ $i + 1 }}</td>
+                                    <td class="border px-2 py-1">{{ $item['nama_barang'] }}</td>
+                                    <td class="border px-2 py-1">{{ number_format($item['terjual'], 0, ',', '.') }}</td>
                                     <td class="border px-2 py-1">Rp
-                                        {{ number_format($detail->barang->harga_beli, 0, ',', '.') }}</td>
+                                        {{ number_format($item['harga_beli'], 0, ',', '.') }}</td>
                                     <td class="border px-2 py-1">Rp
-                                        {{ number_format($detail->barang->harga_jual, 0, ',', '.') }}</td>
-                                    <td class="border px-2 py-1">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
+                                        {{ number_format($item['harga_jual'], 0, ',', '.') }}</td>
+                                    <td class="border px-2 py-1">Rp {{ number_format($item['subtotal'], 0, ',', '.') }}
                                     </td>
-                                    <td class="border px-2 py-1">Rp {{ number_format($item->sisa, 0, ',', '.') }}</td>
-                                    @if ($loop->first)
-                                        <td class="border px-2 py-1 text-green-600 font-semibold"
-                                            rowspan="{{ $item->detail->count() }}">
-                                            Rp {{ number_format($item->laba, 0, ',', '.') }}
-                                        </td>
-                                    @endif
+                                    <td class="border px-2 py-1">Rp {{ number_format($item['piutang'], 0, ',', '.') }}
+                                    </td>
+                                    <td class="border px-2 py-1 text-green-600 font-semibold">Rp
+                                        {{ number_format($item['laba'], 0, ',', '.') }}</td>
                                 </tr>
                             @endforeach
-                        @endforeach
 
-                        <tr class="bg-dark-100 font-bold text-center">
-                            <td colspan="3" class="border px-2 py-1 text-right">Total</td>
-                            <td class="border px-2 py-1">{{ number_format($totalQty, 0, ',', '.') }}</td>
-                            <td class="border px-2 py-1">Rp {{ number_format($totalBarangBeli, 0, ',', '.') }}</td>
-                            <td class="border px-2 py-1">Rp {{ number_format($totalBarangJual, 0, ',', '.') }}</td>
-                            {{-- <td class="border px-2 py-1"></td>
-                            <td class="border px-2 py-1"></td> --}}
-                            <td class="border px-2 py-1">Rp {{ number_format($totalSubtotal, 0, ',', '.') }}</td>
-                            <td class="border px-2 py-1">Rp {{ number_format($totalPiutang, 0, ',', '.') }}</td>
-                            <td class="border px-2 py-1">Rp {{ number_format($data['total_laba'], 0, ',', '.') }}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                            <tr class="bg-dark-100 font-bold text-center">
+                                <td colspan="2" class="border px-2 py-1 text-right">Total</td>
+                                <td class="border px-2 py-1">{{ number_format($totalTerjual, 0, ',', '.') }}</td>
+                                <td class="border px-2 py-1">Rp {{ number_format($data['total_modal'], 0, ',', '.') }}
+                                </td>
+                                {{-- <td class="border px-2 py-1"></td> --}}
+                                <td class="border px-2 py-1">Rp
+                                    {{ number_format($data['total_penjualan'], 0, ',', '.') }}</td>
+                                <td class="border px-2 py-1">Rp
+                                    {{ number_format($data['total_penjualan'], 0, ',', '.') }}</td>
+                                <td class="border px-2 py-1">Rp
+                                    {{ number_format($data['total_piutang'], 0, ',', '.') }}</td>
+                                <td class="border px-2 py-1">Rp {{ number_format($data['total_laba'], 0, ',', '.') }}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
+
         </div>
     @endif
 </x-filament::page>
