@@ -1,3 +1,6 @@
+@php
+    use Filament\Support\Icons\Heroicon;
+@endphp
 <x-filament::page>
     {{-- Form Filter --}}
     <form wire:submit.prevent="generate" class="space-y-4 bg-dark p-4 rounded-lg shadow-sm">
@@ -13,13 +16,15 @@
             @if ($tanggalMulai && $tanggalSelesai && !empty($data['penjualans']))
                 <a href="{{ route('laporan-harian.cetak', ['tanggalMulai' => $tanggalMulai, 'tanggalSelesai' => $tanggalSelesai]) }}"
                     target="_blank"
-                    class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg shadow hover:bg-primary-700 transition">
+                    class="inline-flex items-center px-4 py-2 bg-danger-600 text-white rounded-lg shadow hover:bg-primary-700 transition">
                     <x-filament::icon name="heroicon-o-printer" class="w-5 h-5 mr-2" />
                     Cetak PDF
                 </a>
                 <a href="{{ route('laporan-harian.excel', ['tanggalMulai' => $tanggalMulai, 'tanggalSelesai' => $tanggalSelesai]) }}"
-                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">
-                    <x-filament::icon name="heroicon-o-document-arrow-down" class="w-5 h-5 mr-2" />
+                    target="_blank" {{-- class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition"> --}}
+                    class="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-primary-700 transition">
+                    {{-- <x-filament::icon name="heroicon-o-document-arrow-down" class="w-5 h-5 mr-2" /> --}}
+                    <x-filament::icon name="heroicon-o-document-text" class="w-5 h-5 mr-2" />
                     Cetak Excel
                 </a>
             @endif
@@ -83,7 +88,7 @@
                             <th class="border px-2 py-2">Laba</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    {{-- <tbody>
                         @php
                             $totalQty = 0;
                             $totalBarangBeli = 0;
@@ -106,7 +111,6 @@
                                     $totalKembalian += $item->kembalian;
                                 @endphp
                                 <tr class="text-center text-sm">
-                                    {{-- <td class="border px-2 py-1">{{ $loop->parent->iteration }}</td> --}}
                                     @if ($loop->first)
                                         <td class="border px-2 py-1 text-green-600 font-semibold"
                                             rowspan="{{ $item->detail->count() }}">
@@ -119,42 +123,171 @@
                                             rowspan="{{ $item->detail->count() }}">
                                             {{ $item->no_invoice }}
                                         </td>
-                                    @endif
+                                    @endif --}}
 
-                                    {{-- <td class="border px-2 py-1">
+                    {{-- <td class="border px-2 py-1">
                                         {{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}
                                     </td> --}}
-                                    @if ($loop->first)
-                                        <td class="border px-2 py-1 text-green-600 font-semibold"
-                                            rowspan="{{ $item->detail->count() }}">
-                                            {{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}
-                                        </td>
-                                    @endif
+                    {{-- @if ($loop->first)
+                        <td class="border px-2 py-1 text-green-600 font-semibold"
+                            rowspan="{{ $item->detail->count() }}">
+                            {{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}
+                        </td>
+                    @endif --}}
 
-                                    @if ($loop->first)
+                    {{-- @if ($loop->first)
                                         <td class="border px-2 py-1 text-green-600 font-semibold"
                                             rowspan="{{ $item->detail->count() }}">
                                             {{ $detail->barang->nama_barang ?? 'Barang dihapus' }}
                                         </td>
-                                    @endif
+                                    @endif --}}
 
-                                    <td class="border px-2 py-1">{{ $detail->qty }}</td>
-                                    {{-- @if ($loop->first)
+                    {{-- <td class="border px-2 py-1">
+                                        {{ $detail->barang->nama_barang ?? 'Barang dihapus' }}
+                                    </td> --}}
+
+                    {{-- <td class="border px-2 py-1 text-green-600 font-semibold" rowspan="1">
+                        {!! $item->detail->pluck('barang.nama_barang')->implode('<br>') !!}
+                    </td>
+
+                    <td class="border px-2 py-1">{{ $detail->qty }}</td> --}}
+                    {{-- @if ($loop->first)
                                         <td class="border px-2 py-1 text-green-600 font-semibold"
                                             rowspan="{{ $item->detail->count() }}">
                                             {{ $detail->qty }}
                                         </td>
                                     @endif --}}
-                                    <td class="border px-2 py-1">Rp
-                                        {{ number_format($detail->barang->harga_beli, 0, ',', '.') }}</td>
-                                    <td class="border px-2 py-1">Rp
-                                        {{ number_format($detail->barang->harga_jual, 0, ',', '.') }}</td>
-                                    <td class="border px-2 py-1">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
-                                    </td>
-                                    <td class="border px-2 py-1">Rp {{ number_format($item->sisa, 0, ',', '.') }}</td>
+                    {{-- <td class="border px-2 py-1">Rp
+                        {{ number_format($detail->barang->harga_beli, 0, ',', '.') }}</td>
+                    <td class="border px-2 py-1">Rp
+                        {{ number_format($detail->barang->harga_jual, 0, ',', '.') }}</td>
+                    <td class="border px-2 py-1">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
+                    </td>
+                    <td class="border px-2 py-1">Rp {{ number_format($item->sisa, 0, ',', '.') }}</td>
 
+                    @if ($loop->first)
+                        <td class="border px-2 py-1 text-green-600 font-semibold"
+                            rowspan="{{ $item->detail->count() }}">
+                            Rp {{ number_format($item->laba, 0, ',', '.') }}
+                        </td>
+                    @endif
+                    </tr>
+    @endforeach --}}
+                    {{-- @empty
+        <tr>
+            <td colspan="11" class="border px-2 py-2 text-center text-dark-500">Tidak ada data
+            </td>
+        </tr>
+        @endforelse --}}
+
+                    {{-- Total Keseluruhan --}}
+                    {{-- <tr class="bg-dark-100 font-bold text-center">
+            <td colspan="4" class="border px-2 py-1 text-right">Total</td> --}}
+                    {{-- <td class="border px-2 py-1">Rp {{ number_format($totalQty, 0, ',', '.') }}</td> --}}
+                    {{-- <td class="border px-2 py-1">{{ number_format($data['totalQty'], 0, ',', '.') }}</td>
+            <td class="border px-2 py-1">Rp {{ number_format($totalBarangBeli, 0, ',', '.') }}</td>
+            <td class="border px-2 py-1">Rp {{ number_format($totalBarangJual, 0, ',', '.') }}</td>
+            <td class="border px-2 py-1">Rp {{ number_format($totalSubtotal, 0, ',', '.') }}</td> --}}
+                    {{-- <td class="border px-2 py-1">Rp {{ number_format($totalBayar, 0, ',', '.') }}</td> --}}
+                    {{-- <td class="border px-2 py-1">Rp {{ number_format($totalPiutang, 0, ',', '.') }}</td> --}}
+                    {{-- <td class="border px-2 py-1">Rp {{ number_format($totalKembalian, 0, ',', '.') }}</td> --}}
+                    {{-- <td class="border px-2 py-1">Rp {{ number_format($data['total_laba'], 0, ',', '.') }}</td> --}}
+                    {{-- </tr>
+        </tbody> --}}
+
+                    <tbody>
+                        @php
+                            $totalQty = 0;
+                            $totalBarangBeli = 0;
+                            $totalBarangJual = 0;
+                            $totalSubtotal = 0;
+                            $totalBayar = 0;
+                            $totalPiutang = 0;
+                            $totalKembalian = 0;
+                        @endphp
+
+                        @forelse ($data['penjualans'] as $item)
+                            @php
+                                // Grouping detail per barang
+                                $groupedDetails = $item->detail->groupBy('barang_id')->map(function ($rows) {
+                                    $first = $rows->first();
+                                    return (object) [
+                                        'barang' => $first->barang,
+                                        'qty' => $rows->sum('qty'),
+                                        'harga_beli' => $first->barang->harga_beli ?? 0,
+                                        'harga_jual' => $first->barang->harga_jual ?? 0,
+                                        'subtotal' => $rows->sum('subtotal'),
+                                        'laba' => $rows->sum('laba'),
+                                    ];
+                                });
+                            @endphp
+
+                            @foreach ($groupedDetails as $detail)
+                                @php
+                                    $totalQty += $detail->qty;
+                                    $totalBarangBeli += $detail->harga_beli;
+                                    $totalBarangJual += $detail->harga_jual;
+                                    $totalSubtotal += $detail->subtotal;
+                                    $totalBayar += $item->bayar;
+                                    $totalPiutang += $item->sisa;
+                                    $totalKembalian += $item->kembalian;
+                                @endphp
+                                <tr class="text-center text-sm">
+                                    {{-- Nomor urut sekali saja --}}
                                     @if ($loop->first)
                                         <td class="border px-2 py-1 text-green-600 font-semibold"
+                                            rowspan="{{ $groupedDetails->count() }}">
+                                            {{ $loop->parent->iteration }}
+                                        </td>
+                                    @endif
+
+                                    {{-- Invoice --}}
+                                    @if ($loop->first)
+                                        <td class="border px-2 py-1 text-green-600 font-semibold"
+                                            rowspan="{{ $groupedDetails->count() }}">
+                                            {{ $item->no_invoice }}
+                                        </td>
+                                    @endif
+
+                                    {{-- Tanggal --}}
+                                    @if ($loop->first)
+                                        <td class="border px-2 py-1 text-green-600 font-semibold"
+                                            rowspan="{{ $groupedDetails->count() }}">
+                                            {{ \Carbon\Carbon::parse($item->tanggal)->format('d M Y') }}
+                                        </td>
+                                    @endif
+
+                                    {{-- Nama Barang --}}
+                                    <td class="border px-2 py-1 text-green-600 font-semibold">
+                                        {{ $detail->barang->nama_barang ?? 'Barang dihapus' }}
+                                    </td>
+
+                                    {{-- Qty --}}
+                                    <td class="border px-2 py-1">{{ $detail->qty }}</td>
+
+                                    {{-- Harga Beli --}}
+                                    <td class="border px-2 py-1">Rp
+                                        {{ number_format($detail->harga_beli, 0, ',', '.') }}</td>
+
+                                    {{-- Harga Jual --}}
+                                    <td class="border px-2 py-1">Rp
+                                        {{ number_format($detail->harga_jual, 0, ',', '.') }}</td>
+
+                                    {{-- Subtotal --}}
+                                    <td class="border px-2 py-1">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
+                                    </td>
+
+                                    {{-- Piutang (sekali saja) --}}
+                                    @if ($loop->first)
+                                        <td class="border px-2 py-1 text-green-600 font-semibold"
+                                            rowspan="{{ $groupedDetails->count() }}">
+                                            Rp {{ number_format($item->sisa, 0, ',', '.') }}
+                                        </td>
+                                    @endif
+
+                                    {{-- Laba --}}
+                                    @if ($loop->first)
+                                        <td class="border px-2 py-1 font-semibold text-green-500"
                                             rowspan="{{ $item->detail->count() }}">
                                             Rp {{ number_format($item->laba, 0, ',', '.') }}
                                         </td>
@@ -163,7 +296,8 @@
                             @endforeach
                         @empty
                             <tr>
-                                <td colspan="11" class="border px-2 py-2 text-center text-dark-500">Tidak ada data
+                                <td colspan="11" class="border px-2 py-2 text-center text-dark-500">
+                                    Tidak ada data
                                 </td>
                             </tr>
                         @endforelse
@@ -171,17 +305,15 @@
                         {{-- Total Keseluruhan --}}
                         <tr class="bg-dark-100 font-bold text-center">
                             <td colspan="4" class="border px-2 py-1 text-right">Total</td>
-                            {{-- <td class="border px-2 py-1">Rp {{ number_format($totalQty, 0, ',', '.') }}</td> --}}
-                            <td class="border px-2 py-1">{{ number_format($data['totalQty'], 0, ',', '.') }}</td>
+                            <td class="border px-2 py-1">{{ number_format($totalQty, 0, ',', '.') }}</td>
                             <td class="border px-2 py-1">Rp {{ number_format($totalBarangBeli, 0, ',', '.') }}</td>
                             <td class="border px-2 py-1">Rp {{ number_format($totalBarangJual, 0, ',', '.') }}</td>
                             <td class="border px-2 py-1">Rp {{ number_format($totalSubtotal, 0, ',', '.') }}</td>
-                            {{-- <td class="border px-2 py-1">Rp {{ number_format($totalBayar, 0, ',', '.') }}</td> --}}
                             <td class="border px-2 py-1">Rp {{ number_format($totalPiutang, 0, ',', '.') }}</td>
-                            {{-- <td class="border px-2 py-1">Rp {{ number_format($totalKembalian, 0, ',', '.') }}</td> --}}
                             <td class="border px-2 py-1">Rp {{ number_format($data['total_laba'], 0, ',', '.') }}</td>
                         </tr>
                     </tbody>
+
                 </table>
                 {{-- {{ $data->links() }} --}}
             </div>

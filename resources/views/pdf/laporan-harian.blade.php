@@ -58,7 +58,6 @@
                 <th>Harga Beli</th>
                 <th>Harga Jual</th>
                 <th>Subtotal</th>
-                <th>Bayar</th>
                 <th>Piutang</th>
                 {{-- <th>Kembalian</th> --}}
                 <th>Laba</th>
@@ -130,11 +129,6 @@
                             </td>
                         @endif
                         {{-- <td>Rp {{ number_format($penjualan->bayar, 0, ',', '.') }}</td> --}}
-                        @if ($loop->first)
-                            <td rowspan="{{ $penjualan->detail->count() }}">
-                                {{ number_format($penjualan->bayar, 0, ',', '.') }}
-                            </td>
-                        @endif
                         {{-- <td>Rp {{ number_format($penjualan->sisa, 0, ',', '.') }}</td> --}}
                         @if ($loop->first)
                             <td rowspan="{{ $penjualan->detail->count() }}">
@@ -151,8 +145,8 @@
             @endforeach
 
             <tr class="total-row">
-                <td colspan="3" class="text-left">Total</td>
-                <td>Rp {{ number_format($totalQty, 0, ',', '.') }}</td>
+                <td colspan="4" class="text-center">Total</td>
+                <td>Rp {{ $totalQty }}</td>
                 <td>Rp {{ number_format($totalBarangBeli, 0, ',', '.') }}</td>
                 <td>Rp {{ number_format($totalBarangJual, 0, ',', '.') }}</td>
                 <td>Rp {{ number_format($totalSubtotal, 0, ',', '.') }}</td>
